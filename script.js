@@ -72,4 +72,3 @@ $("#chat-input").on("keypress",(event)=>{
         $("#chat-input").val("");
     }
 })
-
