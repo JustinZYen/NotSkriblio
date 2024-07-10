@@ -3,40 +3,41 @@
 }
 
 body {
+  margin:0px;
+}
+
+.content-container {
   display: flex;
-  flex-direction: ;
-  border: solid red;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .header {
   display: flex;
-  border: solid red;
   background-color: lightgray;
-  height: 300px;
+  height: 100px;
 }
 
 .body {
   display: flex;
   flex-direction: row;
-  border: solid red;
   justify-content: center;
   align-items: center;
 }
 
-canvas {
+.canvas {
+  border: solid 3px black;
   height: 500px;
   width: 500px;
-  border: solid red;
 }
 
 .color-container {
   display: flex;
+  border: solid 3px black;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  border: solid red;
   height: 500px;
   width: 200px;
   background-color: grey;
@@ -51,13 +52,12 @@ canvas {
 .chat {
   display: flex;
   flex-direction: column;
-  border: solid green;
   width: 300px;
   height: 500px;
+  border: solid 3px black;
 }
 
 .log {
-  border: solid red;
   background-color: lightgray;
   font-size: 20px;
   padding: 10px;
@@ -68,7 +68,6 @@ canvas {
 
 input {
   height: 50px;
-  border: solid blue;
   padding: 10px;
   font-size: 20px;
 }

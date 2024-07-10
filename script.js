@@ -33,21 +33,21 @@ document.addEventListener("keydown",(event)=>{
 });
 
 
-const body = document.querySelector("body");
+const body = document.querySelector(".body");
 const colorContainer = document.querySelector(".color-container");
 const colors = colorContainer.children;
 
 const chat = document.querySelector(".chat");
 const input = document.querySelector("input");
 
-// Define color object button
-const colorButton = function (color) {
-  this.color = color;
-  const item = document.createElement("button");
-  item.classList.add("color-button")
-  item.classList.add(`${color}`);
-  item.style.backgroundColor = color;
-  return item;
+class colorButton {
+    constructor(color) {
+        this.color = color;
+        const item = document.createElement("button");
+        item.classList.add("color-button");
+        item.style.backgroundColor = color;
+        return item;
+    }
 }
 
 colorContainer.appendChild(new colorButton("red"));
@@ -59,8 +59,6 @@ colorContainer.appendChild(new colorButton("purple"));
 
 body.appendChild(colorContainer);
 body.appendChild(chat);
-
-input.focus();
 
 $(".color-button").on("click",event => {
     ctx.closePath();
