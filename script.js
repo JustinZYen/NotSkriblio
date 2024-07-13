@@ -56,6 +56,8 @@ colorContainer.appendChild(new colorButton("yellow"));
 colorContainer.appendChild(new colorButton("green"));
 colorContainer.appendChild(new colorButton("blue"));
 colorContainer.appendChild(new colorButton("purple"));
+colorContainer.appendChild(new colorButton("black"));
+colorContainer.appendChild(new colorButton("grey"));
 
 body.appendChild(colorContainer);
 body.appendChild(chat);

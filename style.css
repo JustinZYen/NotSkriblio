@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  margin: 0px;
 }
 
 body {
@@ -26,7 +27,7 @@ body {
   align-items: center;
 }
 
-.canvas {
+canvas {
   border: solid 3px black;
   height: 500px;
   width: 500px;
@@ -57,13 +58,17 @@ body {
   border: solid 3px black;
 }
 
+#log {
+  border: solid red;
+}
+
 .log {
   background-color: lightgray;
   font-size: 20px;
   padding: 10px;
   flex-grow: 1;
   height: 300px;
-  width: 300px;
+  max-width: 300px;
 }
 
 input {
