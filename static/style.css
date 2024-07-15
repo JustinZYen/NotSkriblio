@@ -27,6 +27,10 @@ body {
   align-items: center;
 }
 
+.messages {
+  border: solid red;
+}
+
 canvas {
   border: solid 3px black;
   height: 500px;
@@ -71,7 +75,7 @@ canvas {
   max-width: 300px;
 }
 
-input {
+form {
   height: 50px;
   padding: 10px;
   font-size: 20px;

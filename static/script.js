@@ -36,9 +36,7 @@ document.addEventListener("keydown",(event)=>{
 const body = document.querySelector(".body");
 const colorContainer = document.querySelector(".color-container");
 const colors = colorContainer.children;
-
-const chat = document.querySelector(".chat");
-const input = document.querySelector("input");
+let form = document.getElementById('form');
 
 class colorButton {
     constructor(color) {
@@ -60,7 +58,7 @@ colorContainer.appendChild(new colorButton("black"));
 colorContainer.appendChild(new colorButton("grey"));
 
 body.appendChild(colorContainer);
-body.appendChild(chat);
+body.appendChild(form);
 
 $(".color-button").on("click",event => {
     ctx.closePath();
@@ -75,18 +73,22 @@ $("#chat-input").on("keypress",(event)=>{
     }
 })
 
+let input = document.getElementById('chat-input');
+let log = document.querySelector('.log');
+
 const socket = io();
 
-document.addEventListener("click",(e)=> {
-    socket.emit('chat message', e.clientX);
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    console.log('submitted');
+    socket.emit('chat message', input.value);
+    input.value = '';
 });
 
 socket.on('chat message', (msg) => {
-    /*
     const item = document.createElement('li');
     item.textContent = msg;
-    messages.appendChild(item);
+    log.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
-    */
-   console.log("message received");
+    console.log("message received");
 });
