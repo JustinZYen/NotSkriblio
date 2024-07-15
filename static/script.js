@@ -66,13 +66,15 @@ $(".color-button").on("click",event => {
     ctx.beginPath();
 });
 
+/*
 $("#chat-input").on("keypress",(event)=>{
-    if (event.keyCode == "13") {
+    const ENTER = 13;
+    if (event.keyCode == ENTER) {
         $("#log").append("\n"+$("#chat-input").val());
         $("#chat-input").val("");
     }
 })
-
+*/
 let input = document.getElementById('chat-input');
 let log = document.querySelector('.log');
 
@@ -82,13 +84,13 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
     console.log('submitted');
     socket.emit('chat message', input.value);
+    console.log(input.value);
     input.value = '';
 });
 
 socket.on('chat message', (msg) => {
-    const item = document.createElement('li');
+    const item = document.createElement('p');
     item.textContent = msg;
     log.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
-    console.log("message received");
 });
