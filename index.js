@@ -30,5 +30,11 @@ io.on('connection', (socket) => {
 io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
-   });
+  });
+  socket.on("line drawn", (msg)=>{
+    io.emit('line drawn', msg);
+  });
+  socket.on("line moved", (msg)=>{
+    io.emit('line moved', msg);
+  });
 });

@@ -12,15 +12,6 @@ document.addEventListener("mouseup",()=>{
     mouseDown = false
 });
 // Event listener for when mouse is moved inside the canvas
-canvas.addEventListener("mousemove",(event)=>{
-    var rect = event.target.getBoundingClientRect();
-    if (mouseDown) {
-        ctx.lineTo(event.clientX-rect.left,event.clientY-rect.top);
-        ctx.stroke();
-    } else {
-        ctx.moveTo(event.clientX-rect.left,event.clientY-rect.top);
-    }
-});
 
 // Event listener for when kes are pressed
 document.addEventListener("keydown",(event)=>{
@@ -58,7 +49,6 @@ colorContainer.appendChild(new colorButton("black"));
 colorContainer.appendChild(new colorButton("grey"));
 
 body.appendChild(colorContainer);
-body.appendChild(form);
 
 $(".color-button").on("click",event => {
     ctx.closePath();
@@ -66,17 +56,9 @@ $(".color-button").on("click",event => {
     ctx.beginPath();
 });
 
-/*
-$("#chat-input").on("keypress",(event)=>{
-    const ENTER = 13;
-    if (event.keyCode == ENTER) {
-        $("#log").append("\n"+$("#chat-input").val());
-        $("#chat-input").val("");
-    }
-})
-*/
+
 let input = document.getElementById('chat-input');
-let log = document.querySelector('.log');
+let log = document.querySelector('#log');
 
 const socket = io();
 
@@ -93,4 +75,27 @@ socket.on('chat message', (msg) => {
     item.textContent = msg;
     log.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
+});
+
+canvas.addEventListener("mousemove",(event)=>{
+    var rect = event.target.getBoundingClientRect();
+    if (mouseDown) {
+        //ctx.lineTo(event.clientX-rect.left,event.clientY-rect.top);
+        //ctx.stroke();
+        socket.emit("line drawn",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+    } else {
+        //ctx.moveTo(event.clientX-rect.left,event.clientY-rect.top);
+        socket.emit("line moved",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+    }
+});
+
+socket.on("line drawn",(msg)=>{
+    console.log("line drawn received by page");
+    ctx.lineTo(msg.x,msg.y);
+    ctx.stroke();
+});
+
+socket.on("line moved",(msg)=>{
+    console.log("line moved received by page");
+    ctx.moveTo(msg.x,msg.y);
 });
