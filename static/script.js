@@ -11,9 +11,8 @@ document.addEventListener("mousedown",()=>{
 document.addEventListener("mouseup",()=>{
     mouseDown = false
 });
-// Event listener for when mouse is moved inside the canvas
 
-// Event listener for when kes are pressed
+// Event listener for when keys are pressed
 document.addEventListener("keydown",(event)=>{
     // Clear the canvas
     if (event.key == "r") {
@@ -80,11 +79,8 @@ socket.on('chat message', (msg) => {
 canvas.addEventListener("mousemove",(event)=>{
     var rect = event.target.getBoundingClientRect();
     if (mouseDown) {
-        //ctx.lineTo(event.clientX-rect.left,event.clientY-rect.top);
-        //ctx.stroke();
         socket.emit("line drawn",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
     } else {
-        //ctx.moveTo(event.clientX-rect.left,event.clientY-rect.top);
         socket.emit("line moved",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
     }
 });

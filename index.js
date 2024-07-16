@@ -33,7 +33,6 @@ io.on('connection', (socket) => {
     io.emit('chat message', msg);
   });
   socket.on("line drawn", (msg)=>{
-    console.log("user allowed to draw is: "+activeUser+", current user is: "+socket.id);
     if (socket.id == activeUser) {
       io.emit('line drawn', msg);
     }
