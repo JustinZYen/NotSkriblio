@@ -99,3 +99,13 @@ socket.on("line moved",(msg)=>{
     console.log("line moved received by page");
     ctx.moveTo(msg.x,msg.y);
 });
+
+$(".color-button").on("click",event => {
+    socket.emit("color change",$(event.currentTarget).css("background-color"));
+});
+
+socket.on("color change",(msg) => {
+    ctx.closePath();
+    ctx.strokeStyle = msg;
+    ctx.beginPath();
+});

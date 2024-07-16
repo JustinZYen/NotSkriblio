@@ -25,10 +25,7 @@ body {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-}
-
-.messages {
-  border: solid red;
+  border: solid
 }
 
 canvas {
@@ -64,9 +61,6 @@ canvas {
 
 #log {
   border: solid red;
-}
-
-.log {
   background-color: lightgray;
   font-size: 20px;
   padding: 10px;
@@ -75,8 +69,15 @@ canvas {
   max-width: 300px;
 }
 
+p:nth-child(odd) {
+  background-color: darkgray;
+}
+
+
+
 form {
   height: 50px;
   padding: 10px;
   font-size: 20px;
+  border: solid red;
 }
