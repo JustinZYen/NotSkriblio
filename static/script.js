@@ -39,14 +39,14 @@ class colorButton {
     }
 }
 
+colorContainer.appendChild(new colorButton("black"));
 colorContainer.appendChild(new colorButton("red"));
 colorContainer.appendChild(new colorButton("orange"));
 colorContainer.appendChild(new colorButton("yellow"));
 colorContainer.appendChild(new colorButton("green"));
 colorContainer.appendChild(new colorButton("blue"));
 colorContainer.appendChild(new colorButton("purple"));
-colorContainer.appendChild(new colorButton("black"));
-colorContainer.appendChild(new colorButton("grey"));
+colorContainer.appendChild(new colorButton("white"));
 
 body.appendChild(colorContainer);
 

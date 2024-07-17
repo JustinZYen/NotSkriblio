@@ -7,13 +7,6 @@ body {
   margin:0px;
 }
 
-.content-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
 .header {
   display: flex;
   background-color: lightgray;
@@ -35,14 +28,17 @@ canvas {
 }
 
 .color-container {
+  order: 1;
   display: flex;
   border: solid 3px black;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   height: 500px;
-  width: 200px;
+  width: 250px;
+  min-width: 125px;
   background-color: grey;
+  overflow-y:scroll;
 }
 
 .color-container button {
@@ -51,33 +47,33 @@ canvas {
   margin: 20px;
 }
 
-.chat {
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  height: 500px;
-  border: solid 3px black;
-}
-
 #log {
   border: solid red;
   background-color: lightgray;
   font-size: 20px;
+  margin: 0px;
   padding: 10px;
-  flex-grow: 1;
-  height: 300px;
-  max-width: 300px;
+  height: 450px;
+  overflow-y:scroll;
+ /* order: 2;*/
 }
 
 p:nth-child(odd) {
   background-color: darkgray;
 }
 
-
-
 form {
-  height: 50px;
-  padding: 10px;
+  order: 2;
+  height: 500px;
+  max-width: 300px;
   font-size: 20px;
-  border: solid red;
+}
+
+input {
+  border: solid black;
+  height: 50px;
+  padding: 5px;
+  flex-grow: 1;
+  width: 300px;
+  font-size: 15px;
 }
