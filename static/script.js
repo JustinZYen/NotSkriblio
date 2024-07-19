@@ -22,7 +22,6 @@ document.addEventListener("keydown",(event)=>{
     }
 });
 
-
 const body = document.querySelector(".body");
 const colorContainer = document.querySelector(".color-container");
 const colors = colorContainer.children;
@@ -104,4 +103,12 @@ socket.on("color change",(msg) => {
     ctx.closePath();
     ctx.strokeStyle = msg;
     ctx.beginPath();
+});
+
+let h1 = document.querySelector('h1');
+socket.on("new word", (activeWordLength) => {
+    h1.textContent = '';
+    for (let i = 0; i < activeWordLength; i++) {
+        h1.textContent += '_ ';
+    }
 });

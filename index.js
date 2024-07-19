@@ -5,11 +5,17 @@ import { dirname, join } from 'node:path';
 import { Server } from 'socket.io';
 import fs from 'fs';
 
+let wordArr = [];
 fs.readFile('static/words.txt', (err, data) => {
   if (err) throw err;
- 
-  console.log(data.toString());
+  wordArr = data.toString().split(/[\r\n]+/);
+  //console.log(data.toString().split(/[\r\n]+/));
 });
+
+let getWord = () => {
+  let val = Math.floor(Math.random() * wordArr.length);
+  return wordArr[val];
+}
 
 const app = express();
 const server = createServer(app);
@@ -28,6 +34,7 @@ server.listen(3000, () => {
 
 const userIds = new Set(); 
 let activeUser = null;
+let activeWord = null;
 io.on('connection', (socket) => {
   io.emit('chat message', 'new user joined');
   addUser(socket.id);
@@ -38,6 +45,10 @@ io.on('connection', (socket) => {
   })
   console.log("user with id "+socket.id+" joined");
   socket.on('chat message', (msg) => {
+    if (msg == activeWord) {
+      io.sockets.in(socket.id).emit("chat message","you guessed the word!");
+      setActiveUser(socket.id);
+    }
     io.emit('chat message', socket.id + ": " + msg);
   });
   socket.on("line drawn", (msg)=>{
@@ -78,5 +89,8 @@ function removeUser(userId) {
 function setActiveUser(userId) {
   activeUser = userId;
   console.log("user id "+userId+" is the active user");
-  io.sockets.in(userId).emit("chat message", "you are the active user!");
+  io.sockets.in(userId).emit("chat message", "You are the active user!");
+  activeWord = getWord();
+  io.sockets.in(userId).emit("chat message", "Your word is: "+activeWord);
+  io.emit("new word", activeWord.length);
 }

@@ -4,11 +4,15 @@
 }
 
 body {
+  border: solid red;
   margin:0px;
+  height: 100vh;
 }
 
-.header {
+header {
   display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: lightgray;
   height: 100px;
 }
@@ -35,7 +39,7 @@ canvas {
   align-items: center;
   flex-wrap: wrap;
   height: 500px;
-  width: 250px;
+  width: 225px;
   min-width: 125px;
   background-color: grey;
   overflow-y:scroll;
@@ -50,7 +54,7 @@ canvas {
 #log {
   border: solid red;
   background-color: lightgray;
-  font-size: 20px;
+  font-size: 1.1rem;
   margin: 0px;
   padding: 10px;
   height: 450px;
@@ -66,7 +70,7 @@ form {
   order: 2;
   height: 500px;
   max-width: 300px;
-  font-size: 20px;
+  font-size: 1.1rem;
 }
 
 input {
