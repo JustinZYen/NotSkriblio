@@ -45,6 +45,11 @@ canvas {
   overflow-y:scroll;
 }
 
+h1 {
+  font-size: 3rem;
+  letter-spacing: 1.25rem;
+}
+
 .color-container button {
   height: 50px;
   width: 50px;
@@ -80,4 +85,16 @@ input {
   flex-grow: 1;
   width: 300px;
   font-size: 15px;
+}
+
+#users {
+  border: solid yellow;
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: grow;
+}
+
+.user {
+  border: solid red;
+  padding: 10px;
 }

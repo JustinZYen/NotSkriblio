@@ -112,3 +112,12 @@ socket.on("new word", (activeWordLength) => {
         h1.textContent += '_ ';
     }
 });
+
+const userContainer = document.getElementById("users");
+
+socket.on("new user", (userID) => {
+    let user = document.createElement("div");
+    user.textContent = userID;
+    user.classList.add('user');
+    userContainer.appendChild(user);
+});

@@ -36,20 +36,35 @@ const userIds = new Set();
 let activeUser = null;
 let activeWord = null;
 io.on('connection', (socket) => {
-  io.emit('chat message', 'new user joined');
-  addUser(socket.id);
   socket.join(socket.id); // Join a room containing only the current user
+  for (const onlineUser of userIds) {
+    io.sockets.in(socket.id).emit("new user", onlineUser);
+  }
+  io.emit('chat message', 'new user joined');
+  
+  addUser(socket.id);
+  let username = "User"+socket.id.substring(0,3);
+  if (activeWord.length > 0) {
+    io.sockets.in(socket.id).emit("new word",activeWord.length);
+  }
   socket.on('disconnect', () => {
       console.log('user disconnected');
       removeUser(socket.id);
   })
   console.log("user with id "+socket.id+" joined");
   socket.on('chat message', (msg) => {
-    if (msg == activeWord) {
-      io.sockets.in(socket.id).emit("chat message","you guessed the word!");
-      setActiveUser(socket.id);
+    // Check for name change
+    if (/^\/name .*/.test(msg)) {
+      username = msg.substring(7).trim();
     }
-    io.emit('chat message', socket.id + ": " + msg);
+    else {
+      io.emit('chat message', username + ": " + msg);
+      if (msg == activeWord) {
+        io.sockets.in(socket.id).emit("chat message","you guessed the word!");
+        setActiveUser(socket.id);
+      }
+    }
+    
   });
   socket.on("line drawn", (msg)=>{
     if (socket.id == activeUser) {
@@ -70,6 +85,7 @@ io.on('connection', (socket) => {
 
 
 function addUser(userId) {
+  io.emit("new user", userId);
   userIds.add(userId);
   if (activeUser == null) {
     setActiveUser(userId);
