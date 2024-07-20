@@ -78,12 +78,24 @@ socket.on('chat message', (msg) => {
 canvas.addEventListener("mousemove",(event)=>{
     var rect = event.target.getBoundingClientRect();
     if (mouseDown) {
-        socket.emit("line drawn",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+        //socket.emit("line drawn",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+        socket.emit("canvas event",()=>{
+            console.log("line drawn received by page");
+            ctx.lineTo(event.clientX-rect.left,event.clientY-rect.top);
+            ctx.stroke();
+        });
     } else {
-        socket.emit("line moved",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+        //socket.emit("line moved",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+        socket.emit("canvas event",()=>{
+            console.log("line move received by page");
+            ctx.moveTo(event.clientX-rect.left,event.clientY-rect.top);
+        });
     }
 });
-
+socket.on("canvas event",(func)=>{
+    func();
+})
+/*
 socket.on("line drawn",(msg)=>{
     console.log("line drawn received by page");
     ctx.lineTo(msg.x,msg.y);
@@ -94,17 +106,23 @@ socket.on("line moved",(msg)=>{
     console.log("line moved received by page");
     ctx.moveTo(msg.x,msg.y);
 });
-
+*/
 $(".color-button").on("click",event => {
-    socket.emit("color change",$(event.currentTarget).css("background-color"));
+    //socket.emit("color change",$(event.currentTarget).css("background-color"));
+    socket.emit("canvas event",()=>{
+        ctx.closePath();
+        ctx.strokeStyle = $(event.currentTarget).css("background-color");
+        ctx.beginPath();
+    });
 });
 
+/*
 socket.on("color change",(msg) => {
     ctx.closePath();
     ctx.strokeStyle = msg;
     ctx.beginPath();
 });
-
+*/
 let h1 = document.querySelector('h1');
 socket.on("new word", (activeWordLength) => {
     h1.textContent = '';
