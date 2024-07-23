@@ -57,7 +57,6 @@ $(".color-button").on("click",event => {
 let input = document.getElementById('chat-input');
 let log = document.querySelector('#log');
 
-const socket = io();
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
