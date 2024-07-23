@@ -1,12 +1,37 @@
 * {
   box-sizing: border-box;
+  padding: 0px;
   margin: 0px;
 }
 
-body {
+div, p, h1 {
+  font-family: "Rubik", sans-serif;
+}
+
+.homepage {
   border: solid red;
-  margin:0px;
   height: 100vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.center-container {
+  border: solid red;
+  width: 40%;
+  min-height: 25ch;
+  min-width: 25ch;
+  flex-direction: column;
+}
+
+#home-canvas {
+  border: solid black;
+  height: 20ch;
+  width: 20ch;
+}
+
+.body, #my-canvas, .color-container, input {
+  border: solid 0.1rem black;
 }
 
 header {
@@ -22,11 +47,9 @@ header {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  border: solid
 }
 
-canvas {
-  border: solid 3px black;
+#my-canvas {
   height: 500px;
   width: 500px;
 }
@@ -34,20 +57,19 @@ canvas {
 .color-container {
   order: 1;
   display: flex;
-  border: solid 3px black;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   height: 500px;
-  width: 225px;
+  width: 50vh;
   min-width: 125px;
-  background-color: grey;
-  overflow-y:scroll;
+  overflow-y: auto;
 }
 
 h1 {
   font-size: 3rem;
-  letter-spacing: 1.25rem;
+  font-weight: 100;
+  letter-spacing: 1.1rem;
 }
 
 .color-container button {
@@ -57,18 +79,23 @@ h1 {
 }
 
 #log {
-  border: solid red;
-  background-color: lightgray;
-  font-size: 1.1rem;
-  margin: 0px;
-  padding: 10px;
+  background-color: rgb(228, 225, 225);
+  font-size: 1.5ch;
+  padding: 1ch;
   height: 450px;
   overflow-y:scroll;
  /* order: 2;*/
 }
 
-p:nth-child(odd) {
+/* p:nth-child(odd) {
   background-color: darkgray;
+} */
+
+p {
+  border-left: solid 0.2rem rgb(91, 88, 88);
+  padding-left: 0.5rem;
+  margin-bottom: 1.1ch;
+  word-wrap: break-word;
 }
 
 form {
@@ -78,13 +105,12 @@ form {
   font-size: 1.1rem;
 }
 
-input {
-  border: solid black;
+form>input {
   height: 50px;
-  padding: 5px;
+  padding: 1ch 1ch 1ch 1.5ch;
   flex-grow: 1;
   width: 300px;
-  font-size: 15px;
+  font-size: 1rem;
 }
 
 #users {

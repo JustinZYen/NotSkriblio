@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
     }
     
   });
-  /*
+  
   socket.on("line drawn", (msg)=>{
     if (socket.id == activeUser) {
       io.emit('line drawn', msg);
@@ -82,12 +82,15 @@ io.on('connection', (socket) => {
       io.emit('color change', msg);
     }
   });
-  */
+  
+  /*
   socket.on("canvas event", (func) => {
+    console.log("canvas event received");
     if (socket.id == activeUser) {
       io.emit("canvas event",func)
     }
   });
+  */
 });
 
 
