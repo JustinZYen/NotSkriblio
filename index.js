@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
     // Check for name change
     if (/^\/name .*/.test(msg)) {
-      username = msg.substring(6).trim();
+      setUsername(msg.substring(6).trim());
     }
     else {
       io.emit('chat message', username + ": " + msg);
@@ -83,14 +83,15 @@ io.on('connection', (socket) => {
     }
   });
   
-  /*
-  socket.on("canvas event", (func) => {
-    console.log("canvas event received");
-    if (socket.id == activeUser) {
-      io.emit("canvas event",func)
+  socket.on("set username",(msg) => {
+    setUsername(msg);
+  })
+  function setUsername(newName) {
+    console.log("set username received");
+    if (username != "") {
+      username = newName;
     }
-  });
-  */
+  }
 });
 
 
