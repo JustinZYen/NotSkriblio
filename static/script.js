@@ -1,3 +1,4 @@
+(function script() {
 const canvas = document.getElementById("my-canvas");
 const ctx = canvas.getContext("2d");
 ctx.beginPath();
@@ -45,6 +46,7 @@ colorContainer.appendChild(new colorButton("blue"));
 colorContainer.appendChild(new colorButton("purple"));
 colorContainer.appendChild(new colorButton("white"));
 
+let body = document.querySelector(".body");
 body.appendChild(colorContainer);
 
 $(".color-button").on("click",event => {
@@ -134,3 +136,4 @@ socket.on("new user", (userID) => {
     user.classList.add('user');
     userContainer.appendChild(user);
 });
+}());
