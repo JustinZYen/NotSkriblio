@@ -122,6 +122,7 @@
 
     let h1 = document.querySelector('h1');
     socket.on("new word", (activeWordLength) => {
+        console.log("new word event received by user");
         h1.textContent = '';
         for (let i = 0; i < activeWordLength; i++) {
             h1.textContent += '_ ';

@@ -8,6 +8,7 @@ div, p, h1 {
   font-family: "Rubik", sans-serif;
 }
 
+/* homepage (page 1) */
 .homepage {
   border: solid red;
   height: 100vh;
@@ -30,6 +31,14 @@ div, p, h1 {
   height: 20ch;
   width: 20ch;
 }
+
+/* lobby (page 2) */
+
+#lobby {
+  display: flex;
+}
+
+/* body (page 3) */
 
 .body, #my-canvas, .color-container, input {
   border: solid 0.1rem black;
@@ -115,7 +124,7 @@ form {
   font-size: 1.1rem;
 }
 
-form>input {
+form input {
   height: 50px;
   padding: 1ch 1ch 1ch 1.5ch;
   flex-grow: 1;

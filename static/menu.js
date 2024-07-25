@@ -7,7 +7,6 @@
 
     button.addEventListener('click', () => {  
         lobby.style.display = "flex";
-        // body.style.display = "flex";
         homepage.style.display = "none";
         socket.emit("set username", homeInput.value);
     });

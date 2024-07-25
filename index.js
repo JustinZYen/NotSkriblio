@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
 
     // Instantiate variable representing current room
     if (!rooms.has(roomName)) {
-      rooms.set(roomName,{"activeUser":null, "activeWord":null, "users":new Set()});
+      rooms.set(roomName,{"activeUser":null, "activeWord":"", "users":new Set()});
     }
     const currentRoom = rooms.get(roomName);
 
@@ -72,20 +72,19 @@ io.on('connection', (socket) => {
     io.to(roomName).emit('chat message', 'new user joined');
     
     // Add current user into users list
-    //addUser(socket.id);
+    addUser(socket.id);
 
-
-    /*
-    if (activeWord.length > 0) {
-      io.to(socket.id).emit("new word",activeWord.length);
+    
+    if (currentRoom.activeWord.length > 0) {
+      io.to(socket.id).emit("new word",currentRoom.activeWord.length);
     }
-    */
-   /*
+    
+   
     socket.on('disconnect', () => {
         console.log('user disconnected');
         removeUser(socket.id);
     })
-    */
+    
     console.log("user with id "+socket.id+" joined room with name "+roomName);
     socket.on('chat message', (msg) => {
       // Check for name change
@@ -93,59 +92,59 @@ io.on('connection', (socket) => {
         setUsername(msg.substring(6).trim());
       }
       else {
-        io.emit('chat message', username + ": " + msg);
-        /*
-        if (msg == activeWord) {
+        io.to(roomName).emit('chat message', username + ": " + msg);
+        if (msg == currentRoom.activeWord) {
           io.to(socket.id).emit("chat message","you guessed the word!");
           setActiveUser(socket.id);
         }
-        */
       }
       
     });
     
     socket.on("line drawn", (msg)=>{
-      //if (socket.id == activeUser) {
+      if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('line drawn', msg);
-      //}
+      }
     });
     socket.on("line moved", (msg)=>{
-      //if (socket.id == activeUser) {
+      if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('line moved', msg);
-      //}
+      }
     });
     socket.on("color change", (msg)=>{
-      //if (socket.id == activeUser) {
+      if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('color change', msg);
-      //}
+      }
     });
+
+    // Functions
+    function addUser(userId) {
+      io.to(roomName).emit("new user", userId);
+      currentRoom.users.add(userId);
+      if (currentRoom.activeUser == null) {
+        setActiveUser(userId);
+      }
+    }
+    
+    function removeUser(userId) {
+      currentRoom.users.delete(userId);
+      if (userId == currentRoom.activeUser) {
+        // Choose a new user
+        const [first] = currentRoom.users; // This gets the first element of the set
+        setActiveUser(first);
+        console.log("new user is: "+ currentRoom.activeUser);
+      }
+    }
+    
+    function setActiveUser(userId) {
+      currentRoom.activeUser = userId;
+      console.log("user id "+userId+" is the active user");
+      io.sockets.in(userId).emit("chat message", "You are the active user!");
+      currentRoom.activeWord = getWord();
+      io.sockets.in(userId).emit("chat message", "Your word is: "+currentRoom.activeWord);
+      io.to(roomName).emit("new word", currentRoom.activeWord.length);
+    }
   })
 });
 
 
-function addUser(userId) {
-  io.emit("new user", userId);
-  userIds.add(userId);
-  if (activeUser == null) {
-    setActiveUser(userId);
-  }
-}
-
-function removeUser(userId) {
-  userIds.delete(userId);
-  if (userId == activeUser) {
-    // Choose a new user
-    const [first] = userIds; // This gets the first element of the set
-    setActiveUser(first);
-    console.log("new user is: "+activeUser);
-  }
-}
-
-function setActiveUser(userId) {
-  activeUser = userId;
-  console.log("user id "+userId+" is the active user");
-  io.sockets.in(userId).emit("chat message", "You are the active user!");
-  activeWord = getWord();
-  io.sockets.in(userId).emit("chat message", "Your word is: "+activeWord);
-  io.emit("new word", activeWord.length);
-}
