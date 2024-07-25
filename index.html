@@ -10,15 +10,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script src="global.js" defer></script>
-  <script src="lobby.js" defer></script>
+  <script src="/global.js" defer></script>
+  <script src="/lobby.js" defer></script>
   <script src="/menu.js" defer></script>
   <script src="/script.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1></h1>
-  </header>
   <div class="homepage" style="display: flex">
      <div class="center-container">
       <canvas id="home-canvas"></canvas>
@@ -26,18 +23,20 @@
       <button class="start">Start</button>
      </div>
   </div>
-  <div class="lobby">
-    
-    <!--style="display:none"-->
+  <div id="lobby" style="display: none">
+    <ul id="lobby-list"></ul>
   </div>
   <div class="body" style="display: none">
-    <div id="users"></div>
-    <canvas id="my-canvas"></canvas>
-    <div class="color-container"></div>
-    <form id="form" action="">
-      <div id="log"></div>
-      <input type="text" id="chat-input" autocomplete="off">
-    </form>
+    <header><h1>word to guess goes here</h1></header>
+    <div id="body-content">
+      <div id="users"></div>
+      <canvas id="my-canvas"></canvas>
+      <div class="color-container"></div>
+      <form id="form" action="">
+        <div id="log"></div>
+        <input type="text" id="chat-input" autocomplete="off">
+      </form>
+    </div>
   </div>
 </body>
 </html>

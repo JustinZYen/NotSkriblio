@@ -32,66 +32,94 @@ server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
 });
 
+/*
 const userIds = new Set(); 
 let activeUser = null;
 let activeWord = null;
+*/
+const rooms = new Map(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, "users":<user set/map>}
 io.on('connection', (socket) => {
-  socket.join(socket.id); // Join a room containing only the current user
-  for (const onlineUser of userIds) {
-    io.sockets.in(socket.id).emit("new user", onlineUser);
-  }
-  io.emit('chat message', 'new user joined');
-  
-  addUser(socket.id);
+  io.to(socket.id).emit("new room","Room 1");
+  // Initial connection actions
   let username = "User"+socket.id.substring(0,3);
-  if (activeWord.length > 0) {
-    io.sockets.in(socket.id).emit("new word",activeWord.length);
-  }
-  socket.on('disconnect', () => {
-      console.log('user disconnected');
-      removeUser(socket.id);
-  })
-  console.log("user with id "+socket.id+" joined");
-  socket.on('chat message', (msg) => {
-    // Check for name change
-    if (/^\/name .*/.test(msg)) {
-      setUsername(msg.substring(6).trim());
-    }
-    else {
-      io.emit('chat message', username + ": " + msg);
-      if (msg == activeWord) {
-        io.sockets.in(socket.id).emit("chat message","you guessed the word!");
-        setActiveUser(socket.id);
-      }
-    }
-    
-  });
-  
-  socket.on("line drawn", (msg)=>{
-    if (socket.id == activeUser) {
-      io.emit('line drawn', msg);
-    }
-  });
-  socket.on("line moved", (msg)=>{
-    if (socket.id == activeUser) {
-      io.emit('line moved', msg);
-    }
-  });
-  socket.on("color change", (msg)=>{
-    if (socket.id == activeUser) {
-      io.emit('color change', msg);
-    }
-  });
-  
   socket.on("set username",(msg) => {
     setUsername(msg);
   })
   function setUsername(newName) {
     console.log("set username received");
-    if (username != "") {
+    if (newName != "") {
       username = newName;
     }
   }
+
+  // Actions that only occur once the user joins a room
+  socket.on("join room",(roomName) => {
+    // Make current user join the room
+    socket.join(roomName);
+
+    // Instantiate variable representing current room
+    if (!rooms.has(roomName)) {
+      rooms.set(roomName,{"activeUser":null, "activeWord":null, "users":new Set()});
+    }
+    const currentRoom = rooms.get(roomName);
+
+    // Load the users that are currently in the room
+    for (const onlineUser of currentRoom.users) {
+      io.to(socket.id).emit("new user", onlineUser);
+    }
+
+    // Send a message to everyone that a new user has joined
+    io.to(roomName).emit('chat message', 'new user joined');
+    
+    // Add current user into users list
+    //addUser(socket.id);
+
+
+    /*
+    if (activeWord.length > 0) {
+      io.to(socket.id).emit("new word",activeWord.length);
+    }
+    */
+   /*
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+        removeUser(socket.id);
+    })
+    */
+    console.log("user with id "+socket.id+" joined room with name "+roomName);
+    socket.on('chat message', (msg) => {
+      // Check for name change
+      if (/^\/name .*/.test(msg)) {
+        setUsername(msg.substring(6).trim());
+      }
+      else {
+        io.emit('chat message', username + ": " + msg);
+        /*
+        if (msg == activeWord) {
+          io.to(socket.id).emit("chat message","you guessed the word!");
+          setActiveUser(socket.id);
+        }
+        */
+      }
+      
+    });
+    
+    socket.on("line drawn", (msg)=>{
+      //if (socket.id == activeUser) {
+        io.to(roomName).emit('line drawn', msg);
+      //}
+    });
+    socket.on("line moved", (msg)=>{
+      //if (socket.id == activeUser) {
+        io.to(roomName).emit('line moved', msg);
+      //}
+    });
+    socket.on("color change", (msg)=>{
+      //if (socket.id == activeUser) {
+        io.to(roomName).emit('color change', msg);
+      //}
+    });
+  })
 });
 
 

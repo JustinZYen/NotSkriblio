@@ -21,6 +21,7 @@ div, p, h1 {
   width: 40%;
   min-height: 25ch;
   min-width: 25ch;
+  display: flex;
   flex-direction: column;
 }
 
@@ -39,10 +40,19 @@ header {
   justify-content: center;
   align-items: center;
   background-color: lightgray;
-  height: 100px;
+  height: 50px;
 }
 
 .body {
+  border: solid red;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#body-content {
+  border: solid green;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -57,12 +67,12 @@ header {
 .color-container {
   order: 1;
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   height: 500px;
-  width: 50vh;
-  min-width: 125px;
+  width: 125px;
   overflow-y: auto;
 }
 
@@ -123,4 +133,13 @@ form>input {
 .user {
   border: solid red;
   padding: 10px;
+}
+
+.homepage button {
+  padding: 0.2rem 0.8rem;
+  border-radius: 0.5rem;
+}
+
+.start:hover {
+  background-color: rgb(169, 169, 169);
 }
