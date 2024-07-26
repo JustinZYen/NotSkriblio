@@ -11,8 +11,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="/global.js" defer></script>
-  <script src="/lobby.js" defer></script>
   <script src="/menu.js" defer></script>
+  <script src="/lobby.js" defer></script>
+  <script src="/create-lobby.js" defer></script>
   <script src="/script.js" defer></script>
 </head>
 <body>
@@ -25,6 +26,11 @@
   </div>
   <div id="lobby" style="display: none">
     <ul id="lobby-list"></ul>
+    <button>Create New Lobby</button>
+  </div>
+  <div id="lobby-creator" style="display: none">
+    <input type="text" id="lobby-name" autocomplete="off" placeholder="lobby name">
+    <button id="lobby-create">Create Lobby!</button>
   </div>
   <div class="body" style="display: none">
     <header><h1>word to guess goes here</h1></header>

@@ -1,7 +1,8 @@
 (function lobby(socket) {
     const lobbies = document.getElementById("lobby-list");
-    let body = document.querySelector(".body");
-    let lobby = document.getElementById("lobby");
+    const body = document.querySelector(".body");
+    const lobby = document.getElementById("lobby");
+    const createLobbyButton = document.querySelector("#lobby button");
     socket.on("new room",(roomName) => {
         console.log("new room being made");
         const newRoomBox = document.createElement("li");
@@ -13,5 +14,12 @@
             console.log("newRoomBox with text "+newRoomBox.textContent+" clicked");
             socket.emit("join room",roomName);
         })
+    })
+
+    const lobbyCreator = document.getElementById("lobby-creator");
+    createLobbyButton.addEventListener("click",()=>{
+        console.log("createLobbyButton clicked");
+        lobby.style.display = "none";
+        lobbyCreator.style.display = "flex";
     })
 }(socket));
