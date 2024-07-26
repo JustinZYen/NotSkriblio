@@ -26,7 +26,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
 });
-app.use(express.static(join(__dirname, '/static')));
+app.use(express.static(join(__dirname, 'static/')));
 
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
