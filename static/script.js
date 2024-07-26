@@ -131,9 +131,9 @@
 
     const userContainer = document.getElementById("users");
 
-    socket.on("new user", (userID) => {
+    socket.on("new user", (username) => {
         let user = document.createElement("div");
-        user.textContent = userID;
+        user.textContent = username;
         user.classList.add('user');
         userContainer.appendChild(user);
     });
