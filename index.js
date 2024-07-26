@@ -41,7 +41,7 @@ const rooms = new Map(); // Map room names to an object with {"activeUser":<user
 //"users":<user set/map>, "canvasEvents":<array of canvas events>}
 addRoom("Room 1");
 io.on('connection', (socket) => {
-  for (const [roomName,roomContents] of rooms) {
+  for (const [roomName,_] of rooms) {
     io.to(socket.id).emit("new room",roomName);
   }
   // Initial connection actions
@@ -53,8 +53,14 @@ io.on('connection', (socket) => {
     console.log("set username received");
     if (newName != "") {
       username = newName;
+      socket.emit("update username", );
     }
   }
+
+  // Non-room-dependent events
+  socket.on("new room",(roomName) => {
+    addRoom(roomName);
+  });
 
   // Actions that only occur once the user joins a room
   socket.on("join room",(roomName) => {
@@ -68,8 +74,8 @@ io.on('connection', (socket) => {
     const currentRoom = rooms.get(roomName);
 
     // Load the users that are currently in the room
-    for (const onlineUser of currentRoom.users) {
-      io.to(socket.id).emit("new user", onlineUser);
+    for (const [_, username] of currentRoom.users) {
+      io.to(socket.id).emit("new user", username);
     }
 
     // Draw all current drawing actions
@@ -81,7 +87,7 @@ io.on('connection', (socket) => {
     io.to(roomName).emit('chat message', 'new user joined');
     
     // Add current user into users list
-    addUser(socket.id);
+    addUser(socket.id, username);
 
     // Load in underscores representing new empty word
     if (currentRoom.activeWord.length > 0) {
@@ -130,9 +136,10 @@ io.on('connection', (socket) => {
     });
 
     // Functions
-    function addUser(userId) {
-      io.to(roomName).emit("new user", userId);
-      currentRoom.users.add(userId);
+    function addUser(userId, username) {
+      io.to(roomName).emit("new user", username);
+      console.log(username);
+      currentRoom.users.set(userId, username);
       if (currentRoom.activeUser == null) {
         setActiveUser(userId);
       }
@@ -142,8 +149,8 @@ io.on('connection', (socket) => {
       currentRoom.users.delete(userId);
       if (userId == currentRoom.activeUser) {
         // Choose a new user
-        const [first] = currentRoom.users; // This gets the first element of the set
-        setActiveUser(first);
+        const [first] = currentRoom.users; // This gets the first element of the map as an array of key + value
+        setActiveUser(first[0]);
         console.log("new user is: "+ currentRoom.activeUser);
       }
     }
@@ -160,6 +167,6 @@ io.on('connection', (socket) => {
 });
 
 function addRoom(roomName) {
-  rooms.set(roomName,{"activeUser":null, "activeWord":"", "users":new Set(), "canvasEvents":[]});
+  rooms.set(roomName,{"activeUser":null, "activeWord":"", "users":new Map(), "canvasEvents":[]});
 }
 
