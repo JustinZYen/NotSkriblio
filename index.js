@@ -37,9 +37,13 @@ const userIds = new Set();
 let activeUser = null;
 let activeWord = null;
 */
-const rooms = new Map(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, "users":<user set/map>}
+const rooms = new Map(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, 
+//"users":<user set/map>, "canvasEvents":<array of canvas events>}
+addRoom("Room 1");
 io.on('connection', (socket) => {
-  io.to(socket.id).emit("new room","Room 1");
+  for (const [roomName,roomContents] of rooms) {
+    io.to(socket.id).emit("new room",roomName);
+  }
   // Initial connection actions
   let username = "User"+socket.id.substring(0,3);
   socket.on("set username",(msg) => {
@@ -59,7 +63,7 @@ io.on('connection', (socket) => {
 
     // Instantiate variable representing current room
     if (!rooms.has(roomName)) {
-      rooms.set(roomName,{"activeUser":null, "activeWord":"", "users":new Set()});
+      addRoom(roomName);
     }
     const currentRoom = rooms.get(roomName);
 
@@ -68,13 +72,18 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit("new user", onlineUser);
     }
 
+    // Draw all current drawing actions
+    for (const canvasEvent of currentRoom.canvasEvents) {
+      io.to(socket.id).emit(canvasEvent.action, canvasEvent.params);
+    }
+
     // Send a message to everyone that a new user has joined
     io.to(roomName).emit('chat message', 'new user joined');
     
     // Add current user into users list
     addUser(socket.id);
 
-    
+    // Load in underscores representing new empty word
     if (currentRoom.activeWord.length > 0) {
       io.to(socket.id).emit("new word",currentRoom.activeWord.length);
     }
@@ -104,16 +113,19 @@ io.on('connection', (socket) => {
     socket.on("line drawn", (msg)=>{
       if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('line drawn', msg);
+        currentRoom.canvasEvents.push({"action":"line drawn", "params":msg});
       }
     });
     socket.on("line moved", (msg)=>{
       if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('line moved', msg);
+        currentRoom.canvasEvents.push({"action":"line moved", "params":msg});
       }
     });
     socket.on("color change", (msg)=>{
       if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('color change', msg);
+        currentRoom.canvasEvents.push({"action":"color change", "params":msg});
       }
     });
 
@@ -147,4 +159,7 @@ io.on('connection', (socket) => {
   })
 });
 
+function addRoom(roomName) {
+  rooms.set(roomName,{"activeUser":null, "activeWord":"", "users":new Set(), "canvasEvents":[]});
+}
 
