@@ -42,8 +42,6 @@ figure {
 #home-canvas {
   border-radius: 1rem;
   border: solid black;
-  height: 200px;
-  width: 200px;
   margin-bottom: 0.2rem;
 }
 
@@ -126,11 +124,6 @@ header {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-}
-
-#my-canvas {
-  height: 500px;
-  width: 500px;
 }
 
 .color-container {
