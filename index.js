@@ -149,9 +149,13 @@ io.on('connection', (socket) => {
       currentRoom.users.delete(userId);
       if (userId == currentRoom.activeUser) {
         // Choose a new user
-        const [first] = currentRoom.users; // This gets the first element of the map as an array of key + value
-        setActiveUser(first[0]);
-        console.log("new user is: "+ currentRoom.activeUser);
+        if (currentRoom.users.size == 0) {
+          currentRoom.activeUser = null;
+        } else {
+          const [first] = currentRoom.users; // This gets the first element of the map as an array of key + value
+          setActiveUser(first[0]);
+          console.log("new user is: "+ currentRoom.activeUser);
+        }
       }
     }
     

@@ -16,10 +16,12 @@
         })
     })
 
+    /*
     const lobbyCreator = document.getElementById("lobby-creator");
     createLobbyButton.addEventListener("click",()=>{
         console.log("createLobbyButton clicked");
         lobby.style.display = "none";
         lobbyCreator.style.display = "flex";
     })
+    */
 }(socket));

@@ -12,26 +12,35 @@
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="global.js" defer></script>
   <script src="menu.js" defer></script>
-  <script src="lobby.js" defer></script>
+  <script src="join-lobby.js" defer></script>
   <script src="create-lobby.js" defer></script>
-  <script src="script.js" defer></script>
+  <script src="create-or-join.js" defer></script>
+  <script src="game.js" defer></script>
 </head>
 <body>
   <div class="homepage" style="display: flex">
      <div class="center-container">
       <canvas id="home-canvas"></canvas>
-      <input type="text" id="home-input">
+      <input type="text" id="set-username" autocomplete="off" placeholder="Enter your username">
       <button class="start">Start</button>
      </div>
   </div>
+
+  <div class="create-or-join" style="display: none">
+    <button class="create">Create a New Lobby</button>
+    <button class="join">Join Lobby</button>
+  </div>
+
   <div id="lobby" style="display: none">
     <ul id="lobby-list"></ul>
-    <button>Create New Lobby</button>
+    <!--<button>Create New Lobby</button>-->
   </div>
+
   <div id="lobby-creator" style="display: none">
     <input type="text" id="lobby-name" autocomplete="off" placeholder="lobby name">
     <button id="lobby-create">Create Lobby!</button>
-  </div> 
+  </div>
+
   <div class="body" style="display: none">
     <header><h1>word to guess goes here</h1></header>
     <div id="body-content">
