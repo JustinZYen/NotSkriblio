@@ -8,9 +8,12 @@ div, p, h1 {
   font-family: "Rubik", sans-serif;
 }
 
+.homepage button:hover, .create-or-join button:hover, .lobby button:hover {
+  background-color: rgb(199, 199, 199);
+}
+
 /* homepage (page 1) */
 .homepage {
-  border: solid red;
   height: 100vh;
   width: 100%;
   justify-content: center;
@@ -18,24 +21,81 @@ div, p, h1 {
 }
 
 .center-container {
-  border: solid red;
+  border: solid 3px black;
+  padding: 1rem;
   width: 40%;
-  min-height: 25ch;
-  min-width: 25ch;
+  min-height: 250px;
+  min-width: 400px;
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
 }
 
-#home-canvas {
-  border: solid black;
-  height: 20ch;
-  width: 20ch;
+figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0px;
 }
 
-/* lobby (page 2) */
+#home-canvas {
+  border-radius: 1rem;
+  border: solid black;
+  height: 200px;
+  width: 200px;
+  margin-bottom: 0.2rem;
+}
+
+#canvas-reset {
+  border: solid rgb(52, 52, 52);
+  padding: 0 0.1rem;
+  width: 5rem;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+}
+
+.homepage input {
+  margin-bottom: 0.3rem;
+  padding: 0.25rem;
+  font-size: 1.25rem;
+  height: 2rem;
+  width: 15rem;
+}
+
+.homepage .start {
+  margin-bottom: 1rem;
+  padding: 0.2rem 0.8rem;
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+  height: 2rem;
+  width: 10rem;
+}
+
+/* create or join (page 2) */
+
+.create-or-join {
+  height: 100vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.create-or-join button {
+  border-radius: 1rem;
+  border: solid black;
+  height: 3rem;
+  width: 7rem;
+}
+
+/* lobby (page 3) */
 
 #lobby {
   display: flex;
+}
+
+.create {
+  margin-bottom: 1rem;
 }
 
 /* body (page 3) */
@@ -144,11 +204,3 @@ form input {
   padding: 10px;
 }
 
-.homepage button {
-  padding: 0.2rem 0.8rem;
-  border-radius: 0.5rem;
-}
-
-.start:hover {
-  background-color: rgb(169, 169, 169);
-}

@@ -20,15 +20,20 @@
 <body>
   <div class="homepage" style="display: flex">
      <div class="center-container">
-      <canvas id="home-canvas"></canvas>
+      <figure>
+        <canvas id="home-canvas"></canvas>
+        <button id="canvas-reset">reset</button>
+      </figure>
       <input type="text" id="set-username" autocomplete="off" placeholder="Enter your username">
       <button class="start">Start</button>
      </div>
   </div>
 
   <div class="create-or-join" style="display: none">
-    <button class="create">Create a New Lobby</button>
-    <button class="join">Join Lobby</button>
+    <div class="center-container">
+      <button class="create">Create a New Lobby</button>
+      <button class="join">Join Lobby</button>
+    </div>
   </div>
 
   <div id="lobby" style="display: none">

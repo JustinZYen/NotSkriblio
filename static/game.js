@@ -7,10 +7,10 @@
     canvas.height = 500;
     let mouseDown = false;
     document.addEventListener("mousedown",()=>{
-        mouseDown = true
+        mouseDown = true;
     });
     document.addEventListener("mouseup",()=>{
-        mouseDown = false
+        mouseDown = false;
     });
 
     // Event listener for when keys are pressed
