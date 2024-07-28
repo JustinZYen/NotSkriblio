@@ -36,7 +36,6 @@ figure {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 0px;
 }
 
 #home-canvas {
@@ -56,7 +55,7 @@ figure {
 .homepage input {
   margin-bottom: 0.3rem;
   padding: 0.25rem;
-  font-size: 1.25rem;
+  font-size: 1rem;
   height: 2rem;
   width: 15rem;
 }
@@ -73,6 +72,7 @@ figure {
 /* create or join (page 2) */
 
 .create-or-join {
+  padding: 0px;
   height: 100vh;
   width: 100%;
   justify-content: center;
@@ -86,17 +86,68 @@ figure {
   width: 7rem;
 }
 
-/* lobby (page 3) */
+/* create lobby (page 3) */
+
+/* join lobby (page 3) */
+
+.lobby-header {
+  font-size: 40px;
+  padding-bottom: 1rem;
+}
+
+img {
+  height: 240px;
+  width: auto;
+}
 
 #lobby {
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.bottom {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  min-width: 700px;
+}
+
+#lobby .lobby-container {
+  width: 40%;
+  min-height: 250px;
+  min-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+ul {
+  border: solid black;
+  padding: 0.5rem;
+  width: 95%;
+  min-height: 240px;
+  min-width: 350px;
+  height: 240px;
+  overflow-y: scroll;
+}
+
+li {
+  border: solid 3px black;
+  border-radius: 3px;
+  margin-bottom: 0.2rem;
+  list-style-type: none;
+  justify-content: space-between;
 }
 
 .create {
   margin-bottom: 1rem;
 }
 
-/* body (page 3) */
+/* body (page 4) */
 
 .body, #my-canvas, .color-container, input {
   border: solid 0.1rem black;
@@ -138,7 +189,7 @@ header {
   overflow-y: auto;
 }
 
-h1 {
+body h1 {
   font-size: 3rem;
   font-weight: 100;
   letter-spacing: 1.1rem;

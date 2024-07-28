@@ -24,7 +24,7 @@
         <canvas id="home-canvas"></canvas>
         <button id="canvas-reset">reset</button>
       </figure>
-      <input type="text" id="set-username" autocomplete="off" placeholder="Enter your username">
+      <input type="text" id="set-username" autocomplete="off" placeholder="Enter your username" maxlength="30">
       <button class="start">Start</button>
      </div>
   </div>
@@ -37,7 +37,13 @@
   </div>
 
   <div id="lobby" style="display: none">
-    <ul id="lobby-list"></ul>
+    <h1 class="lobby-header">Current Lobbies</h1>
+    <div class="bottom">
+      <img src="images/ChuckECheeseDeptford00.jpg" alt="chucky cheese">
+      <div class="lobby-container">
+        <ul id="lobby-list"></ul>
+      </div>
+    </div>
     <!--<button>Create New Lobby</button>-->
   </div>
 
