@@ -45,17 +45,21 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit("new room",roomName);
   }
   // Initial connection actions
-  let username = "User"+socket.id.substring(0,3);
+  const userData = {"username":"User"+socket.id.substring(0,3), "profilePicture":{}};
   socket.on("set username",(msg) => {
     setUsername(msg);
   })
   function setUsername(newName) {
-    console.log("set username received");
+    //console.log("set username received");
     if (newName != "") {
-      username = newName;
-      socket.emit("update username", );
+      userData.username = newName;
+      //socket.emit("update username", userData.username);
     }
   }
+
+  socket.on("set profile picture",(msg) => {
+    userData.profilePicture = msg;
+  });
 
   // Non-room-dependent events
   socket.on("new room",(roomName) => {
@@ -74,8 +78,8 @@ io.on('connection', (socket) => {
     const currentRoom = rooms.get(roomName);
 
     // Load the users that are currently in the room
-    for (const [_, username] of currentRoom.users) {
-      io.to(socket.id).emit("new user", username);
+    for (const [_, userData] of currentRoom.users) {
+      io.to(socket.id).emit("new user", userData);
     }
 
     // Draw all current drawing actions
@@ -87,7 +91,7 @@ io.on('connection', (socket) => {
     io.to(roomName).emit('chat message', 'new user joined');
     
     // Add current user into users list
-    addUser(socket.id, username);
+    addUser(socket.id, userData);
 
     // Load in underscores representing new empty word
     if (currentRoom.activeWord.length > 0) {
@@ -136,10 +140,11 @@ io.on('connection', (socket) => {
     });
 
     // Functions
-    function addUser(userId, username) {
-      io.to(roomName).emit("new user", username);
-      console.log(username);
-      currentRoom.users.set(userId, username);
+    function addUser(userId, userData) {
+      console.log("user data being emitted is: "+Object.keys(userData.profilePicture));
+      io.to(roomName).emit("new user", userData);
+      //console.log(username);
+      currentRoom.users.set(userId, userData);
       if (currentRoom.activeUser == null) {
         setActiveUser(userId);
       }
@@ -153,7 +158,7 @@ io.on('connection', (socket) => {
           currentRoom.activeUser = null;
         } else {
           const [first] = currentRoom.users; // This gets the first element of the map as an array of key + value
-          setActiveUser(first[0]);
+          setActiveUser(first[0]); // Set active user to id of first user
           console.log("new user is: "+ currentRoom.activeUser);
         }
       }

@@ -131,10 +131,32 @@
 
     const userContainer = document.getElementById("users");
 
-    socket.on("new user", (username) => {
-        let user = document.createElement("div");
-        user.textContent = username;
+    socket.on("new user", (userData) => {
+        console.log("user data: "+userData);
+        // Create name tag
+        const user = document.createElement("div");
+        user.textContent = userData.username;
         user.classList.add('user');
         userContainer.appendChild(user);
+        // Create profile picture
+        const pfp = document.createElement("canvas");
+        const pfpContext = pfp.getContext("2d");
+        pfpContext.beginPath();
+        pfpContext.moveTo(0,0);
+        pfp.width = 100;
+        pfp.height = 100;
+        const widthMultiplier = pfp.width/userData.profilePicture.width;
+        const heightMultiplier = pfp.height/userData.profilePicture.height;
+        const drawInstructions = userData.profilePicture.drawActions;
+        for (const instruction of drawInstructions) {
+            if (instruction.action == "line drawn") {
+                pfpContext.lineTo(instruction.params.x*widthMultiplier,instruction.params.y*heightMultiplier);
+                pfpContext.stroke();
+            } else if (instruction.action == "line moved") {
+                pfpContext.moveTo(instruction.params.x*widthMultiplier,instruction.params.y*heightMultiplier);
+            } else {
+                console.log("Instruction "+instruction.action+" is not a valid action");
+            }
+        }
     });
 }(socket));
