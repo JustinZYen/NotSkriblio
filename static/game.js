@@ -158,5 +158,6 @@
                 console.log("Instruction "+instruction.action+" is not a valid action");
             }
         }
+        user.appendChild(pfp);
     });
 }(socket));

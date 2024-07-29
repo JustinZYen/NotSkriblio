@@ -45,7 +45,8 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit("new room",roomName);
   }
   // Initial connection actions
-  const userData = {"username":"User"+socket.id.substring(0,3), "profilePicture":{}};
+  let username = "User"+socket.id.substring(0,3);
+  const userData = {"username":username, "profilePicture":{}};
   socket.on("set username",(msg) => {
     setUsername(msg);
   })

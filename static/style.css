@@ -239,8 +239,7 @@ form input {
 #users {
   border: solid yellow;
   display: flex;
-  flex-wrap: wrap;
-  flex-grow: grow;
+  flex-direction: column;
 }
 
 .user {
@@ -248,3 +247,6 @@ form input {
   padding: 10px;
 }
 
+.user canvas {
+  border: solid red;
+}

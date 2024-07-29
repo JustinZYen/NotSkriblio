@@ -10,7 +10,7 @@
     profileCanvas.width = 200;
     profileCanvas.height = 200;
     let mouseDown = false;
-    
+
     document.addEventListener("mousedown",()=>{
         mouseDown = true;
     });
