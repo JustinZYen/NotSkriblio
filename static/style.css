@@ -72,9 +72,8 @@ figure {
 /* create or join (page 2) */
 
 .create-or-join {
-  padding: 0px;
   height: 100vh;
-  width: 100%;
+  width: 100vh;
   justify-content: center;
   align-items: center;
 }
@@ -87,6 +86,28 @@ figure {
 }
 
 /* create lobby (page 3) */
+
+#lobby-creator {
+  height: 100vh;
+  width: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+#lobby-name {
+  margin-bottom: 0.3rem;
+  padding: 0.25rem;
+  font-size: 1rem;
+  height: 2rem;
+  width: 15rem;
+}
+
+#lobby-creator button {
+  border-radius: 1rem;
+  border: solid black;
+  height: 3rem;
+  width: 7rem;
+}
 
 /* join lobby (page 3) */
 
@@ -147,18 +168,14 @@ li {
   margin-bottom: 1rem;
 }
 
-/* body (page 4) */
+/* game (page 4) */
 
 .body, #my-canvas, .color-container, input {
   border: solid 0.1rem black;
 }
 
 header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: lightgray;
-  height: 50px;
+
 }
 
 .body {
@@ -170,6 +187,7 @@ header {
 }
 
 #body-content {
+  min-height: 500px;
   border: solid green;
   display: flex;
   flex-direction: row;
@@ -190,6 +208,12 @@ header {
 }
 
 body h1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray;
+  height: 50px;
+  width: 100%;
   font-size: 3rem;
   font-weight: 100;
   letter-spacing: 1.1rem;
@@ -240,13 +264,20 @@ form input {
   border: solid yellow;
   display: flex;
   flex-direction: column;
+  min-width: 200px;
+  height: 500px;
 }
 
 .user {
-  border: solid red;
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
+  border: solid black;
   padding: 10px;
+  min-height: 100px;
+  font-size: 1rem;
 }
 
 .user canvas {
-  border: solid red;
+  background-color: rgb(228, 228, 228);
 }

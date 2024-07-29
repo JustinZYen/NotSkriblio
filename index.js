@@ -45,8 +45,7 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit("new room",roomName);
   }
   // Initial connection actions
-  let username = "User"+socket.id.substring(0,3);
-  const userData = {"username":username, "profilePicture":{}};
+  const userData = {"username":"User"+socket.id.substring(0,3), "profilePicture":{}};
   socket.on("set username",(msg) => {
     setUsername(msg);
   })
@@ -112,7 +111,7 @@ io.on('connection', (socket) => {
         setUsername(msg.substring(6).trim());
       }
       else {
-        io.to(roomName).emit('chat message', username + ": " + msg);
+        io.to(roomName).emit('chat message', userData.username + ": " + msg);
         if (msg == currentRoom.activeWord) {
           io.to(socket.id).emit("chat message","you guessed the word!");
           setActiveUser(socket.id);
@@ -133,6 +132,12 @@ io.on('connection', (socket) => {
         currentRoom.canvasEvents.push({"action":"line moved", "params":msg});
       }
     });
+    socket.on("line width change", (newWidth) => {
+      if (socket.id == currentRoom.activeUser) {
+        io.to(roomName).emit('line width change', newWidth);
+        currentRoom.canvasEvents.push({"action":"line width change", "params":newWidth});
+      }
+    })
     socket.on("color change", (msg)=>{
       if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('color change', msg);

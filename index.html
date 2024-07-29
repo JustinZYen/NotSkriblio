@@ -48,16 +48,21 @@
   </div>
 
   <div id="lobby-creator" style="display: none">
-    <input type="text" id="lobby-name" autocomplete="off" placeholder="lobby name">
-    <button id="lobby-create">Create Lobby!</button>
+    <div class="center-container">
+      <input type="text" id="lobby-name" autocomplete="off" placeholder="lobby name">
+      <button id="lobby-create">Create Lobby!</button>
+    </div>
   </div>
 
   <div class="body" style="display: none">
-    <header><h1>word to guess goes here</h1></header>
+    <h1 id="word-bar">word to guess goes here</h1>
     <div id="body-content">
       <div id="users"></div>
       <canvas id="my-canvas"></canvas>
-      <div class="color-container"></div>
+      <div id="drawing-options">
+        <input type="range" min="1" max="20" value="5" id="line-width-slider">
+        <div class="color-container"></div>
+      </div>
       <form id="form" action="">
         <div id="log"></div>
         <input type="text" id="chat-input" autocomplete="off">

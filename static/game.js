@@ -1,32 +1,5 @@
 (function script(socket) {
-    const canvas = document.getElementById("my-canvas");
-    const ctx = canvas.getContext("2d");
-    ctx.beginPath();
-    ctx.moveTo(0,0);
-    canvas.width = 500;
-    canvas.height = 500;
-    let mouseDown = false;
-    document.addEventListener("mousedown",()=>{
-        mouseDown = true;
-    });
-    document.addEventListener("mouseup",()=>{
-        mouseDown = false;
-    });
-
-    // Event listener for when keys are pressed
-    document.addEventListener("keydown",(event)=>{
-        // Clear the canvas
-        if (event.key == "r") {
-            ctx.closePath();
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.beginPath();
-        }
-    });
-
-    const colorContainer = document.querySelector(".color-container");
-    const colors = colorContainer.children;
-    let form = document.getElementById('form');
-
+    // Create color buttons
     class colorButton {
         constructor(color) {
             this.color = color;
@@ -36,7 +9,8 @@
             return item;
         }
     }
-
+    
+    const colorContainer = document.querySelector(".color-container");
     colorContainer.appendChild(new colorButton("black"));
     colorContainer.appendChild(new colorButton("red"));
     colorContainer.appendChild(new colorButton("orange"));
@@ -46,15 +20,49 @@
     colorContainer.appendChild(new colorButton("purple"));
     colorContainer.appendChild(new colorButton("white"));
 
-    let body = document.getElementById("body-content");
-    body.appendChild(colorContainer);
+    const canvas = document.getElementById("my-canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    canvas.width = 500;
+    canvas.height = 500;
 
+    // Tracking status of mouse for drawing
+    let mouseDown = false;
+    document.addEventListener("mousedown",()=>{
+        mouseDown = true;
+    });
+    document.addEventListener("mouseup",()=>{
+        mouseDown = false;
+    });
+
+    /*
+    // Event listener for when keys are pressed
+    document.addEventListener("keydown",(event)=>{
+        // Clear the canvas
+        if (event.key == "r") {
+            ctx.closePath();
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.beginPath();
+        }
+    });
+    */
+
+    //const colors = colorContainer.children;
+    let form = document.getElementById('form');
+
+   
+
+    // let body = document.getElementById("body-content");
+    // body.appendChild(colorContainer);
+
+    /*
     $(".color-button").on("click",event => {
         ctx.closePath();
         ctx.strokeStyle = $(event.currentTarget).css("background-color");
         ctx.beginPath();
     });
-
+    */
 
     let input = document.getElementById('chat-input');
     let log = document.querySelector('#log');
@@ -75,52 +83,43 @@
         window.scrollTo(0, document.body.scrollHeight);
     });
 
+    // Listeners for drawing-related actions
     canvas.addEventListener("mousemove",(event)=>{
         var rect = event.target.getBoundingClientRect();
         if (mouseDown) {
             socket.emit("line drawn",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
-            /*
-            socket.emit("canvas event",()=>{
-                console.log("line drawn received by page");
-                ctx.lineTo(event.clientX-rect.left,event.clientY-rect.top);
-                ctx.stroke();
-            });
-            */
         } else {
             socket.emit("line moved",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
-            /*
-            socket.emit("canvas event",()=>{
-                console.log("line move received by page");
-                ctx.moveTo(event.clientX-rect.left,event.clientY-rect.top);
-            });
-            */
         }
     });
+    const widthSlider = document.getElementById("line-width-slider");
+    widthSlider.addEventListener("input",(event)=>{
+        console.log("width slider moved");
+        socket.emit("line width change",event.target.value);
+    })
     $(".color-button").on("click",event => {
         socket.emit("color change",$(event.currentTarget).css("background-color"));
-        /*
-        socket.emit("canvas event",()=>{
-            ctx.closePath();
-            ctx.strokeStyle = $(event.currentTarget).css("background-color");
-            ctx.beginPath();
-        });
-        */
     });
+
 
     socket.on("line drawn",(msg)=>{
         ctx.lineTo(msg.x,msg.y);
         ctx.stroke();
-    })
+    });
     socket.on("line moved",(msg)=>{
         ctx.moveTo(msg.x,msg.y);
-    })
+    });
+    socket.on("line width change", (newWidth)=>{
+        console.log("new width: "+newWidth);
+        ctx.lineWidth = newWidth;
+    });
     socket.on("color change",(msg)=>{
         ctx.closePath();
         ctx.strokeStyle = msg;
         ctx.beginPath();
-    })
+    });
 
-    let h1 = document.querySelector('h1');
+    let h1 = document.getElementById("word-bar");
     socket.on("new word", (activeWordLength) => {
         console.log("new word event received by user");
         h1.textContent = '';
@@ -143,8 +142,8 @@
         const pfpContext = pfp.getContext("2d");
         pfpContext.beginPath();
         pfpContext.moveTo(0,0);
-        pfp.width = 100;
-        pfp.height = 100;
+        pfp.width = 50;
+        pfp.height = 50;
         const widthMultiplier = pfp.width/userData.profilePicture.width;
         const heightMultiplier = pfp.height/userData.profilePicture.height;
         const drawInstructions = userData.profilePicture.drawActions;
