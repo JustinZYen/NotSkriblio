@@ -94,7 +94,6 @@
     });
     const widthSlider = document.getElementById("line-width-slider");
     widthSlider.addEventListener("input",(event)=>{
-        console.log("width slider moved");
         socket.emit("line width change",event.target.value);
     })
     $(".color-button").on("click",event => {
@@ -110,14 +109,20 @@
         ctx.moveTo(msg.x,msg.y);
     });
     socket.on("line width change", (newWidth)=>{
-        console.log("new width: "+newWidth);
+        ctx.closePath();
         ctx.lineWidth = newWidth;
+        ctx.beginPath();
     });
     socket.on("color change",(msg)=>{
         ctx.closePath();
         ctx.strokeStyle = msg;
         ctx.beginPath();
     });
+    socket.on("clear canvas",()=>{
+        ctx.closePath();
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.beginPath();
+    })
 
     let h1 = document.getElementById("word-bar");
     socket.on("new word", (activeWordLength) => {
@@ -134,6 +139,7 @@
         console.log("user data: "+userData);
         // Create name tag
         const user = document.createElement("div");
+        user.id = userData.id;
         user.textContent = userData.username;
         user.classList.add('user');
         userContainer.appendChild(user);
@@ -159,4 +165,8 @@
         }
         user.appendChild(pfp);
     });
+
+    socket.on("remove user", (userId) => {
+        document.getElementById(userId).remove();
+    })
 }(socket));
