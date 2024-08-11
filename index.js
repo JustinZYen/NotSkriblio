@@ -88,7 +88,7 @@ io.on('connection', (socket) => {
     }
 
     // Send a message to everyone that a new user has joined
-    io.to(roomName).emit('chat message', 'new user joined');
+    io.to(roomName).emit('chat message', userData.username + ' joined the room');
     
     // Add current user into users list
     addUser(socket.id, userData);
@@ -101,6 +101,7 @@ io.on('connection', (socket) => {
    
     socket.on('disconnect', () => {
         console.log('user disconnected');
+        io.to(roomName).emit('chat message', userData.username + ' left the room');
         removeUser(socket.id);
     })
     

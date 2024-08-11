@@ -80,7 +80,7 @@
         const item = document.createElement('p');
         item.textContent = msg;
         log.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        log.scrollTop = log.scrollHeight;
     });
 
     // Listeners for drawing-related actions
@@ -139,9 +139,11 @@
         console.log("user data: "+userData);
         // Create name tag
         const user = document.createElement("div");
+        const nickname = document.createElement("p");
         user.id = userData.id;
-        user.textContent = userData.username;
-        user.classList.add('user');
+        nickname.textContent = userData.username;
+        user.classList.add("user");
+        nickname.classList.add("nickname");
         userContainer.appendChild(user);
         // Create profile picture
         const pfp = document.createElement("canvas");
@@ -164,6 +166,7 @@
             }
         }
         user.appendChild(pfp);
+        user.appendChild(nickname);
     });
 
     socket.on("remove user", (userId) => {

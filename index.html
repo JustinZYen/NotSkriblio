@@ -24,7 +24,7 @@
         <canvas id="home-canvas"></canvas>
         <button id="canvas-reset">reset</button>
       </figure>
-      <input type="text" id="set-username" autocomplete="off" placeholder="Enter your username" maxlength="30">
+      <input type="text" id="set-username" autocomplete="off" placeholder="Enter your username" maxlength="25">
       <button class="start">Start</button>
      </div>
   </div>
@@ -60,7 +60,10 @@
       <div id="users"></div>
       <canvas id="my-canvas"></canvas>
       <div id="drawing-options">
-        <input type="range" min="1" max="20" value="5" id="line-width-slider">
+        <div id="adjust">
+          <p>line thickness:</p>
+          <input type="range" min="1" max="20" value="5" id="line-width-slider">
+        </div>
         <div class="color-container"></div>
       </div>
       <form id="form" action="">
