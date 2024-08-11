@@ -62,10 +62,11 @@ io.on('connection', (socket) => {
   });
 
   // Non-room-dependent events
+  /*
   socket.on("new room",(roomName) => {
     addRoom(roomName);
   });
-
+  */
   // Actions that only occur once the user joins a room
   socket.on("join room",(roomName) => {
     // Make current user join the room
@@ -185,6 +186,21 @@ io.on('connection', (socket) => {
 });
 
 function addRoom(roomName) {
-  rooms.set(roomName,{"activeUser":null, "activeWord":"", "users":new Map(), "canvasEvents":[], "time":-1});
+  const MAX_TIME = 90;
+  const activeRoom = {"activeUser":null, "activeWord":"", "users":new Map(), "canvasEvents":[], "time":MAX_TIME};
+  rooms.set(roomName,activeRoom);
+  setInterval(()=>{
+    io.to(roomName).emit("timer change",activeRoom.time);
+    activeRoom.time--;
+  },1000)
 }
+
+function startGame() {
+
+}
+
+// to add: 
+// rounds
+// current drawer cannot guess their own word
+// Point system
 

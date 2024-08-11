@@ -172,4 +172,9 @@
     socket.on("remove user", (userId) => {
         document.getElementById(userId).remove();
     })
+
+    const timer = document.getElementById("timer");
+    socket.on("timer change", (time)=>{
+        timer.textContent = time;
+    });
 }(socket));
