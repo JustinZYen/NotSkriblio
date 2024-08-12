@@ -37,6 +37,70 @@ const userIds = new Set();
 let activeUser = null;
 let activeWord = null;
 */
+class Room {
+  static MAX_TIME = 90;
+  activeUser= null;
+  activeWord= ""; 
+  users = new Map();
+  canvasEvents = [];
+  time = Room.MAX_TIME; 
+  currentRound = 1;
+  userScores= new Map();
+  roomName;
+  constructor(roomName){
+    this.roomName = roomName;
+    setInterval(()=>{
+      if (this.time == 0) {
+        this.time = Room.MAX_TIME;
+        this.nextUser();      
+      }
+      io.to(this.roomName).emit("timer change",this.time);
+      this.time--;
+    },1000)
+  }
+
+  addUser(userId, userData) {
+    console.log("user data being emitted is: "+Object.keys(userData.profilePicture));
+    io.to(this.roomName).emit("new user", userData);
+    //console.log(username);
+    this.users.set(userId, userData);
+    if (this.activeUser == null) {
+      this.setActiveUser(userId);
+    }
+  }
+  
+  removeUser(userId) {
+    this.users.delete(userId);
+    io.to(this.roomName).emit("remove user", userId);
+    if (userId == this.activeUser) {
+      // Choose a new user
+      if (this.users.size == 0) {
+        this.activeUser = null;
+      } else {
+        const [first] = this.users; // This gets the first element of the map as an array of key + value
+        this.setActiveUser(first[0]); // Set active user to id of first user
+        console.log("new user is: "+ this.activeUser);
+      }
+    }
+  }
+
+  setActiveUser(userId) {
+    this.activeUser = userId;
+    console.log("user id "+userId+" is the active user");
+    io.to(userId).emit("chat message", "You are the active user!");
+    
+    this.activeWord = getWord(); // Choose a new word for the active user
+    io.to(userId).emit("chat message", "Your word is: "+this.activeWord);
+    
+    io.to(this.roomName).emit("clear canvas");
+    io.to(this.roomName).emit("new word", this.activeWord.length);
+  }
+
+  nextUser() {
+    const iter = this.users.entries();
+    
+  }
+}
 const rooms = new Map(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, 
 //"users":<user set/map>, "canvasEvents":<array of canvas events>, "time":<current time>}
 addRoom("Room 1");
@@ -92,7 +156,7 @@ io.on('connection', (socket) => {
     io.to(roomName).emit('chat message', userData.username + ' joined the room');
     
     // Add current user into users list
-    addUser(socket.id, userData);
+    currentRoom.addUser(socket.id, userData);
 
     // Load in underscores representing new empty word
     if (currentRoom.activeWord.length > 0) {
@@ -103,7 +167,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('user disconnected');
         io.to(roomName).emit('chat message', userData.username + ' left the room');
-        removeUser(socket.id);
+        currentRoom.removeUser(socket.id);
     })
     
     console.log("user with id "+socket.id+" joined room with name "+roomName);
@@ -116,7 +180,7 @@ io.on('connection', (socket) => {
         io.to(roomName).emit('chat message', userData.username + ": " + msg);
         if (msg == currentRoom.activeWord) {
           io.to(socket.id).emit("chat message","you guessed the word!");
-          setActiveUser(socket.id);
+          currentRoom.setActiveUser(socket.id);
         }
       }
       
@@ -146,61 +210,36 @@ io.on('connection', (socket) => {
         currentRoom.canvasEvents.push({"action":"color change", "params":msg});
       }
     });
-
-    // Functions
-    function addUser(userId, userData) {
-      console.log("user data being emitted is: "+Object.keys(userData.profilePicture));
-      io.to(roomName).emit("new user", userData);
-      //console.log(username);
-      currentRoom.users.set(userId, userData);
-      if (currentRoom.activeUser == null) {
-        setActiveUser(userId);
-      }
-    }
     
-    function removeUser(userId) {
-      currentRoom.users.delete(userId);
-      io.to(roomName).emit("remove user", userId);
-      if (userId == currentRoom.activeUser) {
-        // Choose a new user
-        if (currentRoom.users.size == 0) {
-          currentRoom.activeUser = null;
-        } else {
-          const [first] = currentRoom.users; // This gets the first element of the map as an array of key + value
-          setActiveUser(first[0]); // Set active user to id of first user
-          console.log("new user is: "+ currentRoom.activeUser);
+    function simulateRounds() {
+      const MAX_ROUNDS = 3;
+      while (currentRoom.currentRound <= MAX_ROUNDS) {
+        for (const [_, userData] of currentRoom.users) {
+          currentRoom.activeUser = userData;
         }
-      }
-    }
-    
-    function setActiveUser(userId) {
-      currentRoom.activeUser = userId;
-      console.log("user id "+userId+" is the active user");
-      io.sockets.in(userId).emit("chat message", "You are the active user!");
-      currentRoom.activeWord = getWord();
-      io.sockets.in(userId).emit("chat message", "Your word is: "+currentRoom.activeWord);
-      io.to(roomName).emit("clear canvas");
-      io.to(roomName).emit("new word", currentRoom.activeWord.length);
+          currentRoom.currentRound++;
+      } 
     }
   })
 });
 
+
+
 function addRoom(roomName) {
-  const MAX_TIME = 90;
-  const activeRoom = {"activeUser":null, "activeWord":"", "users":new Map(), "canvasEvents":[], "time":MAX_TIME};
+  const activeRoom = new Room(roomName);
   rooms.set(roomName,activeRoom);
-  setInterval(()=>{
-    io.to(roomName).emit("timer change",activeRoom.time);
-    activeRoom.time--;
-  },1000)
 }
 
-function startGame() {
-
-}
+// add in aciveRoom map:
 
 // to add: 
-// rounds
+// 3 rounds
+// 
+// each player takes turns drawing
+// once all players have drawn increment round and restart
+
+
+// keep track of player score
 // current drawer cannot guess their own word
 // Point system
 
