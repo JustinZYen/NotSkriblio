@@ -174,8 +174,7 @@
     });
 
     socket.on("score change", (scoreData) => {
-        //console.log(scoreData.score);
-        document.querySelector(scoreData.userId+" .score") = scoreData.score;
+        document.querySelector("#"+scoreData.userId+" .score").innerText = "Score: " + scoreData.score;
     })
 
     socket.on("new round", ()=>{
