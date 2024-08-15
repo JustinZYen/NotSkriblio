@@ -218,10 +218,12 @@ li {
 }
 
 #users {
-  border: solid yellow;
+  border: solid 2px black;
   display: flex;
   flex-direction: column;
-  flex: 0 0 200px;
+  min-width: 200px;
+  height: 500px;
+  overflow-y: auto;
 }
 
 #my-canvas{
@@ -308,15 +310,6 @@ form p:nth-child(odd) {
   background-color: rgb(209, 208, 208);
 }
 
-#users {
-  border: solid 2px black;
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-  height: 500px;
-  overflow-y: auto;
-}
-
 .user {
   display: flex;
   border-bottom: solid 2px black;
@@ -328,8 +321,8 @@ form p:nth-child(odd) {
   max-width: 100%;
 }
 
-.user p {
-  max-width: 70%;
+.user .nickname {
+  max-width: 70px;
   word-wrap: break-word;
 }
 
@@ -337,4 +330,15 @@ form p:nth-child(odd) {
   border: solid 2px black;
   border-radius: 2px;
   background-color: rgb(228, 228, 228);
+}
+
+/* New round screen */
+#round-placeholder {
+  position:absolute;
+  top:0;
+  left:0;
+  opacity: 50%;
+  background:gray;
+  height:100%;
+  width:100%;
 }

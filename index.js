@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { Server } from 'socket.io';
 import fs from 'fs';
+import { time } from 'node:console';
 
 let wordArr = [];
 fs.readFile('static/words.txt', (err, data) => {
@@ -37,18 +38,23 @@ const userIds = new Set();
 let activeUser = null;
 let activeWord = null;
 */
+
+
 class Room {
-  static MAX_TIME = 90;
+  static MAX_TIME = 10;
+  static MAX_ROUNDS = 3; 
+  static MIN_PLAYERS = 2; // Need 3 players to start the game
+  currentRound = 0;
   activeUser= null;
-  activeWord= ""; 
-  users = new Map();
+  activeWord= "";
+  users = new Map(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
   canvasEvents = [];
   time = Room.MAX_TIME; 
-  currentRound = 1;
-  userScores= new Map();
   roomName;
+  gameStarted = false;
   constructor(roomName){
     this.roomName = roomName;
+    /*
     setInterval(()=>{
       if (this.time == 0) {
         this.time = Room.MAX_TIME;
@@ -57,9 +63,11 @@ class Room {
       io.to(this.roomName).emit("timer change",this.time);
       this.time--;
     },1000)
+    */
   }
 
   addUser(userId, userData) {
+    userData.score = 0; // Add score field once user has joined a game
     console.log("user data being emitted is: "+Object.keys(userData.profilePicture));
     io.to(this.roomName).emit("new user", userData);
     //console.log(username);
@@ -67,6 +75,10 @@ class Room {
     if (this.activeUser == null) {
       this.setActiveUser(userId);
     }
+    if (!this.gameStarted && this.users.size >= Room.MIN_PLAYERS) {
+      this.startGame();
+    }
+    // Check if there are now enough users to start the game
   }
   
   removeUser(userId) {
@@ -98,9 +110,65 @@ class Room {
 
   nextUser() {
     const iter = this.users.entries();
-    
+    for (const [username,_] of iter) {
+      if (username == this.activeUser) {
+        const iterNext = iter.next().value;
+        if (iterNext) {  // Check if there is a next user (otherwise loop back to start)
+          this.setActiveUser(iterNext[0]);
+        } else {
+          const [first] = this.users; // This gets the first element of the map as an array of key + value
+          this.setActiveUser(first[0]);
+          this.nextRound();
+        }
+      }
+    }
+    // If reaching the end of the player list, advance to the next round
+    // If final round, do something
+  }
+
+  startGame() {
+    console.log("Game started!");
+    this.gameStarted = true;
+    this.nextRound();
+    setInterval(()=>{
+      if (this.time == 0) {
+        this.time = Room.MAX_TIME;
+        this.nextUser();      
+      }
+      io.to(this.roomName).emit("timer change",this.time);
+      this.time--;
+    },1000)
+    // Not sure what else to add
+  }
+
+  nextRound() {
+    this.currentRound++;
+    if (this.currentRound > Room.MAX_ROUNDS) {
+      console.log("Game over!");
+    } else {
+      io.to(this.roomName).emit("new round");
+    }
+  }
+
+  wordGuessed(userId) {
+    if (this.gameStarted) {
+      // Player who guessed the word gets points
+      // Pass active player to the next person
+      console.log('time guessed: ' + this.time);
+      this.addScore(userId, this.time);
+      this.nextUser();
+      this.time = Room.MAX_TIME;
+    }
+  }
+
+  addScore(userId) {
+    this.users.get(userId).score += 500 - (Room.MAX_TIME - this.time) * 5;
+    // Gain 500 points for guessing instantly and -5 points for every extra second it takes to guess
+    console.log(this.users.get(userId).score);
+    io.to(this.roomName).emit("score change", {"userId":userId,"score":this.users.get(userId).score});
   }
 }
+
 const rooms = new Map(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, 
 //"users":<user set/map>, "canvasEvents":<array of canvas events>, "time":<current time>}
 addRoom("Room 1");
@@ -179,8 +247,9 @@ io.on('connection', (socket) => {
       else {
         io.to(roomName).emit('chat message', userData.username + ": " + msg);
         if (msg == currentRoom.activeWord) {
+          currentRoom.wordGuessed(socket.id, time);
           io.to(socket.id).emit("chat message","you guessed the word!");
-          currentRoom.setActiveUser(socket.id);
+          //currentRoom.setActiveUser(socket.id);
         }
       }
       
@@ -210,19 +279,8 @@ io.on('connection', (socket) => {
         currentRoom.canvasEvents.push({"action":"color change", "params":msg});
       }
     });
-    
-    function simulateRounds() {
-      const MAX_ROUNDS = 3;
-      while (currentRoom.currentRound <= MAX_ROUNDS) {
-        for (const [_, userData] of currentRoom.users) {
-          currentRoom.activeUser = userData;
-        }
-          currentRoom.currentRound++;
-      } 
-    }
   })
 });
-
 
 
 function addRoom(roomName) {

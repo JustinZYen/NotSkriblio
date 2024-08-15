@@ -1,6 +1,6 @@
 (function script(socket) {
     // Create color buttons
-    class colorButton {
+    class ColorButton {
         constructor(color) {
             this.color = color;
             const item = document.createElement("button");
@@ -10,16 +10,19 @@
         }
     }
     
+    // Create the various buttons for the colors that you can draw in
     const colorContainer = document.querySelector(".color-container");
-    colorContainer.appendChild(new colorButton("black"));
-    colorContainer.appendChild(new colorButton("red"));
-    colorContainer.appendChild(new colorButton("orange"));
-    colorContainer.appendChild(new colorButton("yellow"));
-    colorContainer.appendChild(new colorButton("green"));
-    colorContainer.appendChild(new colorButton("blue"));
-    colorContainer.appendChild(new colorButton("purple"));
-    colorContainer.appendChild(new colorButton("white"));
+    colorContainer.appendChild(new ColorButton("black"));
+    colorContainer.appendChild(new ColorButton("red"));
+    colorContainer.appendChild(new ColorButton("orange"));
+    colorContainer.appendChild(new ColorButton("yellow"));
+    colorContainer.appendChild(new ColorButton("green"));
+    colorContainer.appendChild(new ColorButton("blue"));
+    colorContainer.appendChild(new ColorButton("purple"));
+    colorContainer.appendChild(new ColorButton("white"));
 
+
+    // Begin canvas for drawing on
     const canvas = document.getElementById("my-canvas");
     const ctx = canvas.getContext("2d");
     ctx.beginPath();
@@ -35,18 +38,6 @@
     document.addEventListener("mouseup",()=>{
         mouseDown = false;
     });
-
-    /*
-    // Event listener for when keys are pressed
-    document.addEventListener("keydown",(event)=>{
-        // Clear the canvas
-        if (event.key == "r") {
-            ctx.closePath();
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.beginPath();
-        }
-    });
-    */
 
     //const colors = colorContainer.children;
     let form = document.getElementById('form');
@@ -139,10 +130,10 @@
         console.log("user data: "+userData);
         // Create name tag
         const user = document.createElement("div");
-        const nickname = document.createElement("p");
-        user.id = userData.id;
-        nickname.textContent = userData.username;
         user.classList.add("user");
+        user.id = userData.id;
+        const nickname = document.createElement("p");
+        nickname.textContent = userData.username;
         nickname.classList.add("nickname");
         userContainer.appendChild(user);
         // Create profile picture
@@ -165,8 +156,12 @@
                 console.log("Instruction "+instruction.action+" is not a valid action");
             }
         }
+        const score = document.createElement("p");
+        score.classList.add("score");
+        score.innerText = "Score: 0";
         user.appendChild(pfp);
         user.appendChild(nickname);
+        user.appendChild(score);
     });
 
     socket.on("remove user", (userId) => {
@@ -177,4 +172,18 @@
     socket.on("timer change", (time)=>{
         timer.textContent = time;
     });
+
+    socket.on("score change", (scoreData) => {
+        //console.log(scoreData.score);
+        document.querySelector(scoreData.userId+" .score") = scoreData.score;
+    })
+
+    socket.on("new round", ()=>{
+        console.log("new round");
+        document.getElementById("round-placeholder").style.display = "block";
+        setTimeout(()=>{
+            document.getElementById("round-placeholder").style.display = "none";
+        },3000);
+    });
+
 }(socket));
