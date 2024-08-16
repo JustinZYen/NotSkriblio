@@ -122,10 +122,14 @@
         for (let i = 0; i < activeWordLength; i++) {
             h1.textContent += '_ ';
         }
+        document.getElementById("round-placeholder").style.display = "block";
+        setTimeout(()=>{
+            document.getElementById("round-placeholder").style.display = "none";
+        },3000);
     });
 
     const userContainer = document.getElementById("users");
-
+    let activeUser = null;
     socket.on("new user", (userData) => {
         console.log("user data: "+userData);
         // Create name tag
@@ -168,6 +172,13 @@
         document.getElementById(userId).remove();
     })
 
+    socket.on("new active user", (userId) => {
+        if (activeUser) {
+            document.getElementById(activeUser).style["background-color"] = "white";
+        }
+        activeUser = userId;
+        document.getElementById(userId).style["background-color"] = "yellow";
+    });
     const timer = document.getElementById("timer");
     socket.on("timer change", (time)=>{
         timer.textContent = time;
@@ -177,12 +188,13 @@
         document.querySelector("#"+scoreData.userId+" .score").innerText = "Score: " + scoreData.score;
     })
 
-    socket.on("new round", ()=>{
-        console.log("new round");
-        document.getElementById("round-placeholder").style.display = "block";
-        setTimeout(()=>{
-            document.getElementById("round-placeholder").style.display = "none";
-        },3000);
-    });
+    // socket.on("new round", ()=>{
+    //     console.log("new round");
+    //     document.getElementById("round-placeholder").style.display = "block";
+    //     setTimeout(()=>{
+    //         document.getElementById("round-placeholder").style.display = "none";
+    //     },3000);
+    // });
 
+    
 }(socket));

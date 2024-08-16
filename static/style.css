@@ -335,10 +335,11 @@ form p:nth-child(odd) {
 /* New round screen */
 #round-placeholder {
   position:absolute;
+  pointer-events:none;
   top:0;
   left:0;
   opacity: 50%;
-  background:gray;
+  background-color:gray;
   height:100%;
   width:100%;
 }

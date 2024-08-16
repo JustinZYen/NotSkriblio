@@ -103,7 +103,7 @@ class Room {
     
     this.activeWord = getWord(); // Choose a new word for the active user
     io.to(userId).emit("chat message", "Your word is: "+this.activeWord);
-    
+    io.to(this.roomName).emit("new active user",this.activeUser);
     io.to(this.roomName).emit("clear canvas");
     io.to(this.roomName).emit("new word", this.activeWord.length);
   }
@@ -145,9 +145,10 @@ class Room {
     this.currentRound++;
     if (this.currentRound > Room.MAX_ROUNDS) {
       console.log("Game over!");
-    } else {
-      io.to(this.roomName).emit("new round");
-    }
+    } 
+    // else {
+    //   io.to(this.roomName).emit("new round");
+    // }
   }
 
   wordGuessed(userId) {
@@ -220,6 +221,9 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit(canvasEvent.action, canvasEvent.params);
     }
 
+    // Highlight the active user
+    io.to(socket.id).emit("new active user", currentRoom.activeUser);
+
     // Send a message to everyone that a new user has joined
     io.to(roomName).emit('chat message', userData.username + ' joined the room');
     
@@ -240,19 +244,14 @@ io.on('connection', (socket) => {
     
     console.log("user with id "+socket.id+" joined room with name "+roomName);
     socket.on('chat message', (msg) => {
-      // Check for name change
-      if (/^\/name .*/.test(msg)) {
-        setUsername(msg.substring(6).trim());
-      }
-      else {
+      msg = msg.trim();
+      if (socket.id != currentRoom.activeUser  && msg.toLowerCase() == currentRoom.activeWord) {
+        currentRoom.wordGuessed(socket.id, time);
+        io.to(socket.id).emit("chat message","You guessed the word!");
+        //currentRoom.setActiveUser(socket.id);
+      } else {
         io.to(roomName).emit('chat message', userData.username + ": " + msg);
-        if (msg == currentRoom.activeWord) {
-          currentRoom.wordGuessed(socket.id, time);
-          io.to(socket.id).emit("chat message","you guessed the word!");
-          //currentRoom.setActiveUser(socket.id);
-        }
       }
-      
     });
     
     socket.on("line drawn", (msg)=>{
@@ -287,17 +286,3 @@ function addRoom(roomName) {
   const activeRoom = new Room(roomName);
   rooms.set(roomName,activeRoom);
 }
-
-// add in aciveRoom map:
-
-// to add: 
-// 3 rounds
-// 
-// each player takes turns drawing
-// once all players have drawn increment round and restart
-
-
-// keep track of player score
-// current drawer cannot guess their own word
-// Point system
-
