@@ -104,10 +104,14 @@ class Room {
     this.activeWord = getWord(); // Choose a new word for the active user
     io.to(userId).emit("chat message", "Your word is: "+this.activeWord);
     io.to(this.roomName).emit("new active user",this.activeUser);
-    io.to(this.roomName).emit("clear canvas");
     io.to(this.roomName).emit("new word", this.activeWord.length);
+    this.clearCanvas();
   }
 
+  clearCanvas() {
+    io.to(this.roomName).emit("clear canvas");
+    this.canvasEvents = [];
+  }
   nextUser() {
     const iter = this.users.entries();
     for (const [username,_] of iter) {
@@ -163,10 +167,16 @@ class Room {
   }
 
   addScore(userId) {
-    this.users.get(userId).score += 500 - (Room.MAX_TIME - this.time) * 5;
+    let points =  500 - (Room.MAX_TIME - this.time) * 5;
     // Gain 500 points for guessing instantly and -5 points for every extra second it takes to guess
-    console.log(this.users.get(userId).score);
+    // Drawer gains a quarter of the number of points the guesser gained
+    
+    this.users.get(userId).score += points
+    this.users.get(this.activeUser).score += Math.floor((points / 4));
+    console.log(Math.floor((points / 4)));
+
     io.to(this.roomName).emit("score change", {"userId":userId,"score":this.users.get(userId).score});
+    io.to(this.roomName).emit("score change", {"userId":this.activeUser,"score":this.users.get(this.activeUser).score});
   }
 }
 
@@ -277,6 +287,9 @@ io.on('connection', (socket) => {
         io.to(roomName).emit('color change', msg);
         currentRoom.canvasEvents.push({"action":"color change", "params":msg});
       }
+    });
+    socket.on("clear canvas",()=>{
+      currentRoom.clearCanvas();
     });
   })
 });

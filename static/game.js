@@ -87,6 +87,10 @@
     widthSlider.addEventListener("input",(event)=>{
         socket.emit("line width change",event.target.value);
     })
+    const clearButton = document.getElementById("clear-button");
+    clearButton.addEventListener("click",()=>{
+        socket.emit("clear canvas");
+    })
     $(".color-button").on("click",event => {
         socket.emit("color change",$(event.currentTarget).css("background-color"));
     });
