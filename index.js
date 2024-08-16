@@ -157,8 +157,8 @@ class Room {
       // Pass active player to the next person
       console.log('time guessed: ' + this.time);
       this.addScore(userId, this.time);
-      this.nextUser();
-      this.time = Room.MAX_TIME;
+      // this.nextUser();
+      // this.time = Room.MAX_TIME;
     }
   }
 
