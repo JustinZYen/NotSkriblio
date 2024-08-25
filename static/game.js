@@ -76,25 +76,50 @@
 
     // Listeners for drawing-related actions
     canvas.addEventListener("mousemove",(event)=>{
-        var rect = event.target.getBoundingClientRect();
+        const rect = event.target.getBoundingClientRect();
         if (mouseDown) {
             socket.emit("line drawn",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
         } else {
             socket.emit("line moved",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
         }
     });
+    canvas.addEventListener("click",event => {
+        const rect = event.target.getBoundingClientRect();
+        const mouseX = event.clientX-rect.left;
+        const mouseY = event.clientY-rect.top;
+        if (document.getElementById("drawing-type-selector").checked) {
+            const imgData = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+            console.log("this is being printed");
+            console.log(imgData);
+            const pixelStack = [(mouseX+mouseY*canvas.width)*4]; // Put first element into pixel stack as index of first value representing a single pixel
+            const startColor = imgData.slice(pixelStack[0],pixelStack[0]+4);
+            console.log("start color: "+startColor);
+            while (pixelStack.length > 0) {
+                const currentPixel = pixelStack.pop();
+
+            }
+        }
+    });
+
     const widthSlider = document.getElementById("line-width-slider");
-    widthSlider.addEventListener("input",(event)=>{
-        socket.emit("line width change",event.target.value);
+    widthSlider.addEventListener("input",()=>{
+        socket.emit("line width change",widthSlider.value);
     })
     const clearButton = document.getElementById("clear-button");
     clearButton.addEventListener("click",()=>{
         socket.emit("clear canvas");
     })
+
+    let strokeColor = "black";
     $(".color-button").on("click",event => {
-        socket.emit("color change",$(event.currentTarget).css("background-color"));
+        strokeColor = $(event.currentTarget).css("background-color")
+        socket.emit("color change",strokeColor);
     });
 
+    socket.on("drawing information request", ()=>{        
+        socket.emit("line width change",widthSlider.value);
+        socket.emit("color change",strokeColor);
+    });
 
     socket.on("line drawn",(msg)=>{
         ctx.lineTo(msg.x,msg.y);
@@ -120,13 +145,16 @@
     })
 
     let h1 = document.getElementById("word-bar");
-    socket.on("new word", (activeWordLength) => {
+    socket.on("new word", (roomInfo) => {
         console.log("new word event received by user");
         h1.textContent = '';
-        for (let i = 0; i < activeWordLength; i++) {
+        for (let i = 0; i < roomInfo.activeWordLength; i++) {
             h1.textContent += '_ ';
         }
-        document.getElementById("round-placeholder").style.display = "block";
+
+        console.log(roomInfo);
+        document.getElementById("round-placeholder").style.display = "flex";
+
         setTimeout(()=>{
             document.getElementById("round-placeholder").style.display = "none";
         },3000);

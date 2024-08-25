@@ -100,11 +100,11 @@ class Room {
     this.activeUser = userId;
     console.log("user id "+userId+" is the active user");
     io.to(userId).emit("chat message", "You are the active user!");
-    
+    io.to(userId).emit("drawing information request"); // Get line width and line color
     this.activeWord = getWord(); // Choose a new word for the active user
     io.to(userId).emit("chat message", "Your word is: "+this.activeWord);
     io.to(this.roomName).emit("new active user",this.activeUser);
-    io.to(this.roomName).emit("new word", this.activeWord.length);
+    io.to(this.roomName).emit("new word", {userList: this.users.entries(), activeWordLength: this.activeWord.length});
     this.clearCanvas();
   }
 
@@ -242,7 +242,8 @@ io.on('connection', (socket) => {
 
     // Load in underscores representing new empty word
     if (currentRoom.activeWord.length > 0) {
-      io.to(socket.id).emit("new word",currentRoom.activeWord.length);
+      console.log(currentRoom.users);
+      io.to(socket.id).emit("new word", {userList: currentRoom.users, activeWord: currentRoom.activeWord.length});
     }
     
    
@@ -293,7 +294,6 @@ io.on('connection', (socket) => {
     });
   })
 });
-
 
 function addRoom(roomName) {
   const activeRoom = new Room(roomName);

@@ -260,7 +260,7 @@ li {
   max-width: 125px;
   grid-template: 1fr;
   padding: 10px;
-  height: 450px;
+  height: 400px;
   overflow-x: hidden;
   overflow-y: scroll;
 }
@@ -269,6 +269,10 @@ li {
   height: 50px;
   width: 50px;
   margin: 20px;
+}
+
+#drawing-type {
+  height:50px;
 }
 
 #form {

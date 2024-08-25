@@ -14,6 +14,7 @@
     document.addEventListener("mousedown",()=>{
         mouseDown = true;
     });
+    
     document.addEventListener("mouseup",()=>{
         mouseDown = false;
     });

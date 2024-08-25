@@ -7,8 +7,7 @@ Plans for changes:
 Make something show up when the game ends
     Display final rankings
 Make timer stop when grey screen shows up
-Make it so that multiple people can guess the same word
 undo/redo buttons(optional)
 issues when joining game late
-Fix issue with line thickness input from previous user carrying on to new active player
-Fix issue with line color input from previous user carrying on to new active player
+ - add fill tool
+issue where moving mouse out of canvas and then dragging mouse in from different location causes line to be drawn between entry and exit points
