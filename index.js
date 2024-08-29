@@ -41,7 +41,7 @@ let activeWord = null;
 
 
 class Room {
-  static MAX_TIME = 10;
+  static MAX_TIME = 20;
   static MAX_ROUNDS = 3; 
   static MIN_PLAYERS = 2; // Need 3 players to start the game
   currentRound = 0;
@@ -104,7 +104,7 @@ class Room {
     this.activeWord = getWord(); // Choose a new word for the active user
     io.to(userId).emit("chat message", "Your word is: "+this.activeWord);
     io.to(this.roomName).emit("new active user",this.activeUser);
-    io.to(this.roomName).emit("new word", {userList: this.users.entries(), activeWordLength: this.activeWord.length});
+    io.to(this.roomName).emit("new word", this.activeWord.length);
     this.clearCanvas();
   }
 
@@ -137,7 +137,9 @@ class Room {
     setInterval(()=>{
       if (this.time == 0) {
         this.time = Room.MAX_TIME;
-        this.nextUser();      
+        console.log(this.users);
+        io.to(this.roomName).emit("display scores", this.users);
+        this.nextUser();  
       }
       io.to(this.roomName).emit("timer change",this.time);
       this.time--;
@@ -160,7 +162,7 @@ class Room {
       // Player who guessed the word gets points
       // Pass active player to the next person
       console.log('time guessed: ' + this.time);
-      this.addScore(userId, this.time);
+      this.addScore(userId);
       // this.nextUser();
       // this.time = Room.MAX_TIME;
     }
@@ -171,9 +173,12 @@ class Room {
     // Gain 500 points for guessing instantly and -5 points for every extra second it takes to guess
     // Drawer gains a quarter of the number of points the guesser gained
     
-    this.users.get(userId).score += points
-    this.users.get(this.activeUser).score += Math.floor((points / 4));
-    console.log(Math.floor((points / 4)));
+    // this.users.get(userId).score += points
+    // io.to(userId).emit('update points', points);
+    // io.to(this.activeUser).emit('update points', points);
+
+    this.users.get(userId).score += points;
+    this.users.get(this.activeUser).score += Math.floor(points / 4);
 
     io.to(this.roomName).emit("score change", {"userId":userId,"score":this.users.get(userId).score});
     io.to(this.roomName).emit("score change", {"userId":this.activeUser,"score":this.users.get(this.activeUser).score});
@@ -202,6 +207,10 @@ io.on('connection', (socket) => {
 
   socket.on("set profile picture",(msg) => {
     userData.profilePicture = msg;
+  });
+
+  socket.on('update points', (points) => {
+    userData.score += points;
   });
 
   // Non-room-dependent events
@@ -242,10 +251,8 @@ io.on('connection', (socket) => {
 
     // Load in underscores representing new empty word
     if (currentRoom.activeWord.length > 0) {
-      console.log(currentRoom.users);
-      io.to(socket.id).emit("new word", {userList: currentRoom.users, activeWord: currentRoom.activeWord.length});
+      io.to(socket.id).emit("new word", currentRoom.activeWord.length);
     }
-    
    
     socket.on('disconnect', () => {
         console.log('user disconnected');

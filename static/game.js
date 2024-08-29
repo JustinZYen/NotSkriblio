@@ -85,19 +85,75 @@
     });
     canvas.addEventListener("click",event => {
         const rect = event.target.getBoundingClientRect();
-        const mouseX = event.clientX-rect.left;
-        const mouseY = event.clientY-rect.top;
+        const mouseX = Math.round(event.clientX-rect.left);
+        const mouseY = Math.round(event.clientY-rect.top);
         if (document.getElementById("drawing-type-selector").checked) {
-            const imgData = ctx.getImageData(0,0,canvas.width,canvas.height).data;
-            console.log("this is being printed");
-            console.log(imgData);
+            const targetColor = [122,122,122];
+            const img = ctx.getImageData(0,0,canvas.width,canvas.height)
+            const imgData = img.data;
             const pixelStack = [(mouseX+mouseY*canvas.width)*4]; // Put first element into pixel stack as index of first value representing a single pixel
-            const startColor = imgData.slice(pixelStack[0],pixelStack[0]+4);
+            const startColor = imgData.slice(pixelStack[0],pixelStack[0]+3);
+            if (targetColor[0] == startColor[0] && targetColor[1] == startColor[1] && targetColor[2] == startColor[2]) {
+                console.log("target color matches start color!");
+                return;
+            }
             console.log("start color: "+startColor);
             while (pixelStack.length > 0) {
-                const currentPixel = pixelStack.pop();
-
+                let currentPixel = pixelStack.pop();
+                console.log("current pixel: "+currentPixel);
+                let higherPixel = currentPixel - canvas.width*4; // Get pixel exactly above current pixel
+                while (higherPixel > 0 && colorMatches(higherPixel)) {
+                    currentPixel = higherPixel;
+                    higherPixel -= canvas.width * 4;
+                }
+                let canAddLeft = ((currentPixel/4) % (canvas.width)) > 4;
+                let canAddRight = ((currentPixel/4) % (canvas.width)) < (canvas.width-1);
+                let addedLeft = false;
+                let addedRight = false;
+                while (currentPixel < imgData.length && colorMatches(currentPixel)) {
+                    colorPixel(currentPixel);
+                    if (canAddLeft) {
+                        const leftPixel = currentPixel-4;
+                        if (colorMatches(leftPixel)) {
+                            if (!addedLeft) {
+                                pixelStack.push(leftPixel);
+                                addedLeft = true;
+                            }
+                        } else{
+                            addedLeft = false;
+                        }
+                    }
+                    if (canAddRight) {
+                        const rightPixel = currentPixel+4;
+                        if (colorMatches(rightPixel)) {
+                            if (!addedRight) {
+                                pixelStack.push(rightPixel);
+                                addedRight = true;
+                            }
+                        } else{
+                            addedRight = false;
+                        }
+                    }
+                    currentPixel += canvas.width * 4;  
+                }
             }
+
+            function colorMatches(pixelIndex) {
+                //console.log("pixelIndex: "+pixelIndex);
+                return imgData[pixelIndex] == startColor[0] && 
+                imgData[pixelIndex+1] == startColor[1] && 
+                imgData[pixelIndex+2] == startColor[2];
+            }
+
+            function colorPixel(pixelIndex) {
+                //console.log("color matches now?"+colorMatches(pixelIndex));
+                //console.log("coloring...")
+                imgData[pixelIndex] = targetColor[0];
+                imgData[pixelIndex+1] = targetColor[1];
+                imgData[pixelIndex+2] = targetColor[2];
+                //console.log("color still matches?"+colorMatches(pixelIndex));
+            }
+            ctx.putImageData(img, 0, 0);
         }
     });
 
@@ -145,16 +201,17 @@
     })
 
     let h1 = document.getElementById("word-bar");
-    socket.on("new word", (roomInfo) => {
+    socket.on("new word", (activeWordLength) => {
         console.log("new word event received by user");
         h1.textContent = '';
-        for (let i = 0; i < roomInfo.activeWordLength; i++) {
+        for (let i = 0; i < activeWordLength; i++) {
             h1.textContent += '_ ';
         }
+    });
 
-        console.log(roomInfo);
+    socket.on("display scores", (users) => {
+        console.log(users);
         document.getElementById("round-placeholder").style.display = "flex";
-
         setTimeout(()=>{
             document.getElementById("round-placeholder").style.display = "none";
         },3000);
