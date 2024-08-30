@@ -13,3 +13,4 @@ issues when joining game late
 issue where moving mouse out of canvas and then dragging mouse in from different location causes line to be drawn between entry and exit points
 make it clearer which player you are in the player list
 error with active user not being changed properly when the active user leaves (cannot read properties of null)
+make it clearer what color you have selected

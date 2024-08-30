@@ -110,7 +110,7 @@ class Room {
 
   clearCanvas() {
     io.to(this.roomName).emit("clear canvas");
-    this.canvasEvents = [];
+    this.canvasEvents = [{"action":"clear canvas"}];
   }
   nextUser() {
     const iter = this.users.entries();
@@ -138,7 +138,6 @@ class Room {
       if (this.time == 0) {
         this.time = Room.MAX_TIME;
         console.log(this.users);
-        io.to(this.roomName).emit("display scores", this.users);
         this.nextUser();  
       }
       io.to(this.roomName).emit("timer change",this.time);
@@ -259,6 +258,12 @@ io.on('connection', (socket) => {
         io.to(roomName).emit('chat message', userData.username + ' left the room');
         currentRoom.removeUser(socket.id);
     })
+
+    socket.on('display scores', () => {
+      for (const [_, userData] of currentRoom.users) {
+        io.to(roomName).emit('display scores', userData);
+      }
+    });
     
     console.log("user with id "+socket.id+" joined room with name "+roomName);
     socket.on('chat message', (msg) => {
@@ -282,6 +287,12 @@ io.on('connection', (socket) => {
       if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('line moved', msg);
         currentRoom.canvasEvents.push({"action":"line moved", "params":msg});
+      }
+    });
+    socket.on("fill area",(msg) => {
+      if (socket.id == currentRoom.activeUser) {
+        io.to(roomName).emit('fill area', msg);
+        currentRoom.canvasEvents.push({"action":"fill area", "params":msg});
       }
     });
     socket.on("line width change", (newWidth) => {
