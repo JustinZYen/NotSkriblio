@@ -41,14 +41,16 @@ let activeWord = null;
 
 
 class Room {
-  static MAX_TIME = 10;
+  static MAX_TIME = 5;
   static MAX_ROUNDS = 3; 
-  static MIN_PLAYERS = 2; // Need 3 players to start the game
+  static MIN_PLAYERS = 1; // Need 3 players to start the game
+  static BETWEEN_ROUNDS_MS = 3000;
   currentRound = 0;
   activeUser= null;
   activeWord= "";
   users = new Map(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
   canvasEvents = [];
+  timer = null;
   time = Room.MAX_TIME; 
   roomName;
   gameStarted = false;
@@ -104,13 +106,13 @@ class Room {
     this.activeWord = getWord(); // Choose a new word for the active user
     io.to(userId).emit("chat message", "Your word is: "+this.activeWord);
     io.to(this.roomName).emit("new active user",this.activeUser);
-    io.to(this.roomName).emit("new word", {userList: this.users.entries(), activeWordLength: this.activeWord.length});
+    io.to(this.roomName).emit("new word", this.activeWord.length);
     this.clearCanvas();
   }
 
   clearCanvas() {
     io.to(this.roomName).emit("clear canvas");
-    this.canvasEvents = [];
+    this.canvasEvents = [
   }
   nextUser() {
     const iter = this.users.entries();
@@ -130,18 +132,32 @@ class Room {
     // If final round, do something
   }
 
+  runTimer() {
+    this.timer = setInterval(()=>{
+      io.to(this.roomName).emit("timer change",this.time);
+      if (this.time == 0) {
+        this.time = Room.MAX_TIME;
+        this.resetTimer();
+        this.nextUser()
+        
+      }
+      this.time--;
+    },1000)
+  }
+
+  resetTimer() {
+    clearTimeout(this.timer);
+    setTimeout(()=> {
+
+    }, this.BETWEEN_ROUNDS_MS);
+    this.runTimer();
+  }
+
   startGame() {
     console.log("Game started!");
     this.gameStarted = true;
     this.nextRound();
-    setInterval(()=>{
-      if (this.time == 0) {
-        this.time = Room.MAX_TIME;
-        this.nextUser();      
-      }
-      io.to(this.roomName).emit("timer change",this.time);
-      this.time--;
-    },1000)
+    this.runTimer();
     // Not sure what else to add
   }
 
@@ -160,7 +176,7 @@ class Room {
       // Player who guessed the word gets points
       // Pass active player to the next person
       console.log('time guessed: ' + this.time);
-      this.addScore(userId, this.time);
+      this.addScore(userId);
       // this.nextUser();
       // this.time = Room.MAX_TIME;
     }
@@ -171,9 +187,12 @@ class Room {
     // Gain 500 points for guessing instantly and -5 points for every extra second it takes to guess
     // Drawer gains a quarter of the number of points the guesser gained
     
-    this.users.get(userId).score += points
-    this.users.get(this.activeUser).score += Math.floor((points / 4));
-    console.log(Math.floor((points / 4)));
+    // this.users.get(userId).score += points
+    // io.to(userId).emit('update points', points);
+    // io.to(this.activeUser).emit('update points', points);
+
+    this.users.get(userId).score += points;
+    this.users.get(this.activeUser).score += Math.floor(points / 4);
 
     io.to(this.roomName).emit("score change", {"userId":userId,"score":this.users.get(userId).score});
     io.to(this.roomName).emit("score change", {"userId":this.activeUser,"score":this.users.get(this.activeUser).score});
@@ -202,6 +221,10 @@ io.on('connection', (socket) => {
 
   socket.on("set profile picture",(msg) => {
     userData.profilePicture = msg;
+  });
+
+  socket.on('update points', (points) => {
+    userData.score += points;
   });
 
   // Non-room-dependent events
@@ -242,16 +265,20 @@ io.on('connection', (socket) => {
 
     // Load in underscores representing new empty word
     if (currentRoom.activeWord.length > 0) {
-      console.log(currentRoom.users);
-      io.to(socket.id).emit("new word", {userList: currentRoom.users, activeWord: currentRoom.activeWord.length});
+      io.to(socket.id).emit("new word", currentRoom.activeWord.length);
     }
-    
    
     socket.on('disconnect', () => {
         console.log('user disconnected');
         io.to(roomName).emit('chat message', userData.username + ' left the room');
         currentRoom.removeUser(socket.id);
     })
+
+    socket.on('display scores', () => {
+      for (const [_, userData] of currentRoom.users) {
+        io.to(roomName).emit('display scores', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
+      }
+    });
     
     console.log("user with id "+socket.id+" joined room with name "+roomName);
     socket.on('chat message', (msg) => {
@@ -275,6 +302,12 @@ io.on('connection', (socket) => {
       if (socket.id == currentRoom.activeUser) {
         io.to(roomName).emit('line moved', msg);
         currentRoom.canvasEvents.push({"action":"line moved", "params":msg});
+      }
+    });
+    socket.on("fill area",(msg) => {
+      if (socket.id == currentRoom.activeUser) {
+        io.to(roomName).emit('fill area', msg);
+        currentRoom.canvasEvents.push({"action":"fill area", "params":msg});
       }
     });
     socket.on("line width change", (newWidth) => {

@@ -22,6 +22,8 @@ div, p, h1 {
 
 .center-container {
   border: solid 3px black;
+  background-color: #fafafa;
+  box-shadow: 5px 5px 5px rgb(150, 150, 150);
   padding: 1rem;
   width: 40%;
   min-height: 250px;
@@ -39,8 +41,9 @@ figure {
 }
 
 #home-canvas {
-  border-radius: 1rem;
+  /* border-radius: 1rem; */
   border: solid black;
+  background-color: white;
   margin-bottom: 0.2rem;
 }
 
@@ -81,6 +84,7 @@ figure {
 .create-or-join button {
   border-radius: 1rem;
   border: solid black;
+  margin-bottom: 10px;
   height: 3rem;
   width: 7rem;
 }
@@ -346,4 +350,8 @@ form p:nth-child(odd) {
   background-color:gray;
   height:100%;
   width:100%;
+}
+
+.tempUser {
+  border: solid red;
 }
