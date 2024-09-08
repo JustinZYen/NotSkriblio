@@ -112,7 +112,7 @@ class Room {
 
   clearCanvas() {
     io.to(this.roomName).emit("clear canvas");
-    this.canvasEvents = [
+    this.canvasEvents = [{"action":"clear canvas"}];
   }
   nextUser() {
     const iter = this.users.entries();
