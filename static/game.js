@@ -130,18 +130,13 @@
         y = msg.y;
     });
     socket.on("fill area",(msg)=>{
-        function getRGB(hex) {
-            const bigint = parseInt(hex, 16);
-            const r = (bigint >> 16) & 255;
-            const g = (bigint >> 8) & 255;
-            const b = bigint & 255;
-            return [r,g,b];
+        function getRGB(rgbString) {
+            // Taken from https://www.30secondsofcode.org/js/s/rgb-to-array-or-object/
+            return rgbString.match(/\d+/g).map(Number);
         }
         const mouseX = Math.round(msg.x);
         const mouseY = Math.round(msg.y);
-        const targetColor = getRGB(colors[strokeColor]);
-        console.log("color hex code: "+colors[strokeColor]);
-        console.log("targeted color: "+targetColor);
+        const targetColor = getRGB(strokeColor);
         const img = ctx.getImageData(0,0,canvas.width,canvas.height)
         const imgData = img.data;
         console.log(imgData.length);
