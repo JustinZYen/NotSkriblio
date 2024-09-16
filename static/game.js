@@ -1,15 +1,6 @@
 (function script(socket) {
     // Create color buttons
-    const colors = {
-        "black":"#0000ff",
-        "red":"#ff0000",
-        "orange":"#ffa500",
-        "yellow":"#ffff00",
-        "green":"#008000",
-        "blue":"#0000ff",
-        "purple":"#800080",
-        "white":"#ffffff"
-    };
+    const colors = ["black","red","orange","yellow","green","blue","purple","white"];
     class ColorButton {
         constructor(color) {
             this.color = color;
@@ -22,7 +13,7 @@
     
     // Create the various buttons for the colors that you can draw in
     const colorContainer = document.querySelector(".color-container");
-    for (const color of Object.keys(colors)) {
+    for (const color of colors) {
         colorContainer.appendChild(new ColorButton(color));
     }
     /*
