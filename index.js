@@ -41,10 +41,10 @@ let activeWord = null;
 
 
 class Room {
-  static MAX_TIME = 5;
+  static MAX_TIME = 10;
   static MAX_ROUNDS = 3; 
   static MIN_PLAYERS = 1; // Need 3 players to start the game
-  static BETWEEN_ROUNDS_MS = 3000;
+  static BETWEEN_ROUNDS_MS = 5000;
   currentRound = 0;
   activeUser= null;
   activeWord= "";
@@ -114,6 +114,7 @@ class Room {
     io.to(this.roomName).emit("clear canvas");
     this.canvasEvents = [{"action":"clear canvas"}];
   }
+
   nextUser() {
     const iter = this.users.entries();
     for (const [username,_] of iter) {
@@ -138,8 +139,6 @@ class Room {
       if (this.time == 0) {
         this.time = Room.MAX_TIME;
         this.resetTimer();
-        this.nextUser()
-        
       }
       this.time--;
     },1000)
@@ -148,9 +147,9 @@ class Room {
   resetTimer() {
     clearTimeout(this.timer);
     setTimeout(()=> {
-
-    }, this.BETWEEN_ROUNDS_MS);
-    this.runTimer();
+      this.runTimer();
+      this.nextUser();
+    }, Room.BETWEEN_ROUNDS_MS);
   }
 
   startGame() {
@@ -158,7 +157,6 @@ class Room {
     this.gameStarted = true;
     this.nextRound();
     this.runTimer();
-    // Not sure what else to add
   }
 
   nextRound() {
