@@ -79,14 +79,22 @@
         mouseDown = false;
     });
 
+    canvas.addEventListener("mouseenter",(event) => {
+        socket.emit("line moved",{"x":event.offsetX,"y":event.offsetY});
+    });
     canvas.addEventListener("mousemove",(event)=>{
-        const rect = event.target.getBoundingClientRect();
-        if (mouseDown) {
-            socket.emit("line drawn",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+        if (mouseDown && !document.getElementById("drawing-type-selector").checked) {
+            socket.emit("line drawn",{"x":event.offsetX,"y":event.offsetY});
         } else {
-            socket.emit("line moved",{"x":event.clientX-rect.left,"y":event.clientY-rect.top});
+            socket.emit("line moved",{"x":event.offsetX,"y":event.offsetY});
         }
     });
+
+    canvas.addEventListener("mouseleave",(event) => {
+        if (mouseDown) {
+            socket.emit("line drawn",{"x":event.offsetX,"y":event.offsetY});
+        }
+    })
 
     canvas.addEventListener("click",event => {
         if (document.getElementById("drawing-type-selector").checked) {
