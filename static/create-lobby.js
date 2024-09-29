@@ -1,5 +1,5 @@
-(function lobbyCreationMenu(socket) {
-    const lobbyNameField = document.getElementById("lobby-name");
+import {socket} from "./global.js";
+const lobbyNameField = document.getElementById("lobby-name");
     const lobbyCreateButton = document.getElementById("lobby-create");
     const lobbyCreator = document.getElementById("lobby-creator");
     const body = document.querySelector(".body");
@@ -10,4 +10,3 @@
         body.style.display = "flex";
         lobbyCreator.style.display = "none";
     })
-}(socket));
