@@ -275,6 +275,14 @@ li {
   margin: 20px;
 }
 
+.color-container .selected {
+  border-width:5px;
+}
+
+.color-container :not(.selected):hover {
+  border-width:3px;
+}
+
 #drawing-type {
   height:50px;
 }
@@ -348,10 +356,19 @@ form p:nth-child(odd) {
   left:0;
   opacity: 50%;
   background-color:gray;
+  padding: 3ch;
   height:100%;
   width:100%;
 }
+/* 
+#round-placeholder .body {
+  display: flex;
+  height: 50vh;
+  width: 50vw;
+  border: solid red;
+} */
 
 .tempUser {
   border: solid red;
 }
+
