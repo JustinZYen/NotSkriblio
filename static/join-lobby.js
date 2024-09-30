@@ -1,3 +1,4 @@
+"use strict";
 import {socket} from "./global.js";
 const lobbies = document.getElementById("lobby-list");
 const body = document.querySelector(".body");

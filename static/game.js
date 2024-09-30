@@ -1,3 +1,4 @@
+"use strict";
 
 import {socket} from "./global.js";
 // Create color buttons

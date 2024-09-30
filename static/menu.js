@@ -1,3 +1,4 @@
+"use strict";
 import {socket} from "./global.js";
 
 const homepage = document.querySelector(".homepage");
