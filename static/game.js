@@ -104,11 +104,20 @@ clearButton.addEventListener("click", () => {
     socket.emit("clear canvas");
 })
 
-let strokeColor = "black";
+let strokeColor = "rgb(0,0,0)";
+let clickedColor = null;
 $(".color-button").on("click", event => {
-    strokeColor = $(event.currentTarget).css("background-color")
+    // Change border width of previously selected color back to normal
+    if (clickedColor != null) {
+        clickedColor.classList.remove("selected");
+    }
+    strokeColor = $(event.currentTarget).css("background-color") // Set stroke color to color of new box
+    $(event.currentTarget).addClass("selected"); // Increase border width of current box
+    clickedColor = $(event.currentTarget)[0];
     socket.emit("color change", strokeColor);
 });
+
+
 // endregion
 // region Listeners for drawing actions from the server
 socket.on("drawing information request", () => {
@@ -214,6 +223,9 @@ socket.on("color change", (msg) => {
 });
 socket.on("clear canvas", () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (clickedColor != null) {
+        clickedColor.classList.remove("selected");
+    }
 })
 // endregion
 // endregion
@@ -291,13 +303,17 @@ socket.on("score change", (scoreData) => {
 });
 
 socket.on('display scores', (lobbyData) => {
-    // let tempUser = document.createElement('div');
-    // tempUser.classList.add('tempUser');j
-    // tempUser.textContent = user.username;
-    // roundPlaceholder.appendChild(tempUser);
-    document.getElementById("round-placeholder").style.display = "flex";
+    // let body = document.createElement('div');
+
+    // let users = document.querySelector('.user-list');
+    // users.appendChild(lobbyData.userData.username);
+
+    let transition = document.getElementById("round-placeholder");
+    // transition.appendChild(users);
+    
+    transition.style.display = "flex";
     setTimeout(() => {
-        document.getElementById("round-placeholder").style.display = "none";
+        transition.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
     console.log(lobbyData.userData);
 });
