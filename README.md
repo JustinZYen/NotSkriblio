@@ -13,3 +13,4 @@ Plans for changes:
 - reset room when game ends
 Bugs:
 - Players joining the room late do not see the scores of previous players until they gain new points
+- Players joining the room late see other players as having their own username
