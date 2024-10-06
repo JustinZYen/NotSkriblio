@@ -11,4 +11,5 @@ Plans for changes:
 - error with active user not being changed properly when the active user leaves (cannot read properties of null)
 - Make player scores show up if you join lobby late (Currently all show up as 0 initially)
 - reset room when game ends
-- only first user can see highlighted player
+Bugs:
+- Players joining the room late do not see the scores of previous players until they gain new points

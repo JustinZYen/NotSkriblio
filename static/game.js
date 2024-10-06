@@ -284,14 +284,19 @@ socket.on("remove user", (userId) => {
 })
 
 socket.on("new active user", (userInfo) => {
-    const prevUser = userInfo.prevUser;
-    if (prevUser != null) {
-        document.getElementById(prevUser).style["background-color"] = "white";
+    if (userInfo.hasOwnProperty("prevUser")) {
+        const prevUser = userInfo.prevUser;
+        if (prevUser != null) {
+            document.getElementById(prevUser).style["background-color"] = "white";
+        }
     }
     const newUser = userInfo.newUser;
-    document.getElementById(newUser).style["background-color"] = "yellow";
+    if (newUser != null) {
+        document.getElementById(newUser).style["background-color"] = "yellow";
+    }
 });
 
+// Updates the displayed timer
 const timer = document.getElementById("timer");
 socket.on("timer change", (time) => {
     timer.textContent = time;
@@ -300,22 +305,22 @@ socket.on("timer change", (time) => {
     }
 });
 
+// Updates score of a player
 socket.on("score change", (scoreData) => {
     document.querySelector("#" + scoreData.userId + " .score").innerText = "Score: " + scoreData.score;
 });
 
 socket.on('display scores', (lobbyData) => {
-    let body = document.createElement('div');
+    let transition = document.getElementById("round-placeholder");
+    transition.style.display = "flex";
 
     let users = document.querySelector('.user-list');
     users.appendChild(lobbyData.userData.username);
-
-    let transition = document.getElementById("round-placeholder");
-    transition.style.display = "flex";
-    transition.appendChild(user);
+    console.log(lobbyData.userData.username);
     
     setTimeout(() => {
         transition.style.display = "none";
+        
     }, lobbyData.BETWEEN_ROUNDS_MS);
     console.log(lobbyData.userData);
 });
