@@ -311,18 +311,19 @@ socket.on("score change", (scoreData) => {
 });
 
 socket.on('display scores', (lobbyData) => {
-    let transition = document.getElementById("round-placeholder");
-    transition.style.display = "flex";
+    let tempUser = document.createElement('div');
+    tempUser.classList.add('tempUser');
+    tempUser.textContent = lobbyData.userData.username;
 
-    let users = document.querySelector('.user-list');
-    users.appendChild(lobbyData.userData.username);
-    console.log(lobbyData.userData.username);
-    
+    const userList = document.querySelector('.user-list');
+    userList.appendChild(tempUser);
+
+    const roundPlaceholder = document.getElementById("round-placeholder");
+    roundPlaceholder.style.display = "flex";
+
     setTimeout(() => {
-        transition.style.display = "none";
-        
+        roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
-    console.log(lobbyData.userData);
 });
 
 // socket.on("new round", ()=>{

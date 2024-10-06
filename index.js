@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
     const currentRoom = rooms.get(roomName);
 
     // Load the users that are currently in the room
-    for (const [_, userData] of currentRoom.users) {
+    for (const [_, username] of currentRoom.users) {
       io.to(socket.id).emit("new user", userData);
     }
 
@@ -105,6 +105,7 @@ io.on('connection', (socket) => {
 
     socket.on('display scores', () => {
       for (const [_, userData] of currentRoom.users) {
+        console.log(userData);
         io.to(roomName).emit('display scores', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
       }
     });
