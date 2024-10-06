@@ -240,7 +240,7 @@ socket.on("new word", (activeWordLength) => {
 });
 
 const userContainer = document.getElementById("users");
-let activeUser = null;
+// let activeUser = null;
 socket.on("new user", (userData) => {
     console.log("user data: " + userData);
     // Create name tag
@@ -283,13 +283,15 @@ socket.on("remove user", (userId) => {
     document.getElementById(userId).remove();
 })
 
-socket.on("new active user", (userId) => {
-    if (activeUser) {
-        document.getElementById(activeUser).style["background-color"] = "white";
+socket.on("new active user", (userInfo) => {
+    const prevUser = userInfo.prevUser;
+    if (prevUser != null) {
+        document.getElementById(prevUser).style["background-color"] = "white";
     }
-    activeUser = userId;
-    document.getElementById(userId).style["background-color"] = "yellow";
+    const newUser = userInfo.newUser;
+    document.getElementById(newUser).style["background-color"] = "yellow";
 });
+
 const timer = document.getElementById("timer");
 socket.on("timer change", (time) => {
     timer.textContent = time;
@@ -303,15 +305,15 @@ socket.on("score change", (scoreData) => {
 });
 
 socket.on('display scores', (lobbyData) => {
-    // let body = document.createElement('div');
+    let body = document.createElement('div');
 
-    // let users = document.querySelector('.user-list');
-    // users.appendChild(lobbyData.userData.username);
+    let users = document.querySelector('.user-list');
+    users.appendChild(lobbyData.userData.username);
 
     let transition = document.getElementById("round-placeholder");
-    // transition.appendChild(users);
-    
     transition.style.display = "flex";
+    transition.appendChild(user);
+    
     setTimeout(() => {
         transition.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);

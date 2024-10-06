@@ -3,20 +3,8 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { Server } from 'socket.io';
-import fs from 'fs';
 import { time } from 'node:console';
-
-let wordArr = [];
-fs.readFile('static/words.txt', (err, data) => {
-  if (err) throw err;
-  wordArr = data.toString().split(/[\r\n]+/);
-  //console.log(data.toString().split(/[\r\n]+/));
-});
-
-let getWord = () => {
-  let val = Math.floor(Math.random() * wordArr.length);
-  return wordArr[val];
-}
+import { Room } from './room.js'
 
 const app = express();
 const server = createServer(app);
@@ -39,163 +27,6 @@ let activeUser = null;
 let activeWord = null;
 */
 
-
-class Room {
-  static MAX_TIME = 10;
-  static MAX_ROUNDS = 3; 
-  static MIN_PLAYERS = 1; // Need 3 players to start the game
-  static BETWEEN_ROUNDS_MS = 5000;
-  currentRound = 0;
-  activeUser= null;
-  activeWord= "";
-  users = new Map(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
-  canvasEvents = [];
-  timer = null;
-  time = Room.MAX_TIME; 
-  roomName;
-  gameStarted = false;
-  constructor(roomName){
-    this.roomName = roomName;
-    /*
-    setInterval(()=>{
-      if (this.time == 0) {
-        this.time = Room.MAX_TIME;
-        this.nextUser();      
-      }
-      io.to(this.roomName).emit("timer change",this.time);
-      this.time--;
-    },1000)
-    */
-  }
-
-  addUser(userId, userData) {
-    userData.score = 0; // Add score field once user has joined a game
-    console.log("user data being emitted is: "+Object.keys(userData.profilePicture));
-    io.to(this.roomName).emit("new user", userData);
-    //console.log(username);
-    this.users.set(userId, userData);
-    if (this.activeUser == null) {
-      this.setActiveUser(userId);
-    }
-    if (!this.gameStarted && this.users.size >= Room.MIN_PLAYERS) {
-      this.startGame();
-    }
-    // Check if there are now enough users to start the game
-  }
-  
-  removeUser(userId) {
-    this.users.delete(userId);
-    io.to(this.roomName).emit("remove user", userId);
-    if (userId == this.activeUser) {
-      // Choose a new user
-      if (this.users.size == 0) {
-        this.activeUser = null;
-      } else {
-        const [first] = this.users; // This gets the first element of the map as an array of key + value
-        this.setActiveUser(first[0]); // Set active user to id of first user
-        console.log("new user is: "+ this.activeUser);
-      }
-    }
-  }
-
-  setActiveUser(userId) {
-    this.activeUser = userId;
-    console.log("user id "+userId+" is the active user");
-    io.to(userId).emit("chat message", "You are the active user!");
-    io.to(userId).emit("drawing information request"); // Get line width and line color
-    this.activeWord = getWord(); // Choose a new word for the active user
-    io.to(userId).emit("chat message", "Your word is: "+this.activeWord);
-    io.to(this.roomName).emit("new active user",this.activeUser);
-    io.to(this.roomName).emit("new word", this.activeWord.length);
-    this.clearCanvas();
-  }
-
-  clearCanvas() {
-    io.to(this.roomName).emit("clear canvas");
-    this.canvasEvents = [{"action":"clear canvas"}];
-  }
-
-  nextUser() {
-    const iter = this.users.entries();
-    for (const [username,_] of iter) {
-      if (username == this.activeUser) {
-        const iterNext = iter.next().value;
-        if (iterNext) {  // Check if there is a next user (otherwise loop back to start)
-          this.setActiveUser(iterNext[0]);
-        } else {
-          const [first] = this.users; // This gets the first element of the map as an array of key + value
-          this.setActiveUser(first[0]);
-          this.nextRound();
-        }
-      }
-    }
-    // If reaching the end of the player list, advance to the next round
-    // If final round, do something
-  }
-
-  runTimer() {
-    this.timer = setInterval(()=>{
-      io.to(this.roomName).emit("timer change",this.time);
-      if (this.time == 0) {
-        this.time = Room.MAX_TIME;
-        this.resetTimer();
-      }
-      this.time--;
-    },1000)
-  }
-
-  resetTimer() {
-    clearTimeout(this.timer);
-    setTimeout(()=> {
-      this.runTimer();
-      this.nextUser();
-    }, Room.BETWEEN_ROUNDS_MS);
-  }
-
-  startGame() {
-    console.log("Game started!");
-    this.gameStarted = true;
-    this.nextRound();
-    this.runTimer();
-  }
-
-  nextRound() {
-    this.currentRound++;
-    if (this.currentRound > Room.MAX_ROUNDS) {
-      console.log("Game over!");
-    } 
-    // else {
-    //   io.to(this.roomName).emit("new round");
-    // }
-  }
-
-  wordGuessed(userId) {
-    if (this.gameStarted) {
-      // Player who guessed the word gets points
-      // Pass active player to the next person
-      console.log('time guessed: ' + this.time);
-      this.addScore(userId);
-      // this.nextUser();
-      // this.time = Room.MAX_TIME;
-    }
-  }
-
-  addScore(userId) {
-    let points =  500 - (Room.MAX_TIME - this.time) * 5;
-    // Gain 500 points for guessing instantly and -5 points for every extra second it takes to guess
-    // Drawer gains a quarter of the number of points the guesser gained
-    
-    // this.users.get(userId).score += points
-    // io.to(userId).emit('update points', points);
-    // io.to(this.activeUser).emit('update points', points);
-
-    this.users.get(userId).score += points;
-    this.users.get(this.activeUser).score += Math.floor(points / 4);
-
-    io.to(this.roomName).emit("score change", {"userId":userId,"score":this.users.get(userId).score});
-    io.to(this.roomName).emit("score change", {"userId":this.activeUser,"score":this.users.get(this.activeUser).score});
-  }
-}
 
 const rooms = new Map(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, 
 //"users":<user set/map>, "canvasEvents":<array of canvas events>, "time":<current time>}
@@ -273,9 +104,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('display scores', () => {
-      for (const [_, userData] of currentRoom.users) {
-        io.to(socket.id).emit('display scores', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
-      }
+      io.to(socket.id).emit('display scores', {'users':currentRoom.users, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
     });
     
     console.log("user with id "+socket.id+" joined room with name "+roomName);
@@ -327,6 +156,6 @@ io.on('connection', (socket) => {
 });
 
 function addRoom(roomName) {
-  const activeRoom = new Room(roomName);
+  const activeRoom = new Room(roomName,io);
   rooms.set(roomName,activeRoom);
 }
