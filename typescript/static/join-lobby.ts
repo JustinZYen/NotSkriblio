@@ -1,11 +1,11 @@
 "use strict";
 import {socket} from "./global.js";
-const lobbies = document.getElementById("lobby-list");
-const body = document.querySelector(".body");
-const lobby = document.getElementById("lobby");
+const lobbies = document.getElementById("lobby-list")!;
+const body = <HTMLElement>document.querySelector(".body")!;
+const lobby = document.getElementById("lobby")!;
 
 // Event listener for new room events (all rooms are emitted to users upon entering the website)
-socket.on("new room", (roomName) => {
+socket.on("new room", (roomName:string) => {
     console.log("new room being made");
     const newRoomBox = document.createElement("li");
     newRoomBox.textContent = "Room: " + roomName;

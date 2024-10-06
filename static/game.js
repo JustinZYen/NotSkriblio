@@ -1,22 +1,20 @@
 "use strict";
-
-import {socket} from "./global.js";
+import { socket } from "./global.js";
 // Create color buttons
 const colors = ["black", "red", "orange", "yellow", "green", "blue", "purple", "white"];
 class ColorButton {
+    element;
     constructor(color) {
-        this.color = color;
-        const item = document.createElement("button");
-        item.classList.add("color-button");
-        item.style.backgroundColor = color;
-        return item;
+        //this.color = color;
+        this.element = document.createElement("button");
+        this.element.classList.add("color-button");
+        this.element.style.backgroundColor = color;
     }
 }
-
 // Create the various buttons for the colors that you can draw in
 const colorContainer = document.querySelector(".color-container");
 for (const color of colors) {
-    colorContainer.appendChild(new ColorButton(color));
+    colorContainer.appendChild(new ColorButton(color).element);
 }
 /*
 colorContainer.appendChild(new ColorButton("black"));
@@ -28,10 +26,7 @@ colorContainer.appendChild(new ColorButton("blue"));
 colorContainer.appendChild(new ColorButton("purple"));
 colorContainer.appendChild(new ColorButton("white"));
 */
-
-
 //const colors = colorContainer.children;
-
 // region - Chat message handling
 let form = document.getElementById('form');
 let input = document.getElementById('chat-input');
@@ -52,7 +47,6 @@ socket.on('chat message', (msg) => {
     log.scrollTop = log.scrollHeight;
 });
 // endregion
-
 // region Handling drawing
 // region Begin canvas for drawing on
 const canvas = document.getElementById("my-canvas");
@@ -71,60 +65,53 @@ document.addEventListener("mousedown", () => {
 document.addEventListener("mouseup", () => {
     mouseDown = false;
 });
-
 canvas.addEventListener("mouseenter", (event) => {
     socket.emit("line moved", { "x": event.offsetX, "y": event.offsetY });
 });
 canvas.addEventListener("mousemove", (event) => {
     if (mouseDown && !document.getElementById("drawing-type-selector").checked) {
         socket.emit("line drawn", { "x": event.offsetX, "y": event.offsetY });
-    } else {
+    }
+    else {
         socket.emit("line moved", { "x": event.offsetX, "y": event.offsetY });
     }
 });
-
 canvas.addEventListener("mouseleave", (event) => {
     if (mouseDown) {
         socket.emit("line drawn", { "x": event.offsetX, "y": event.offsetY });
     }
-})
-
+});
 canvas.addEventListener("click", event => {
     if (document.getElementById("drawing-type-selector").checked) {
-        socket.emit("fill area", { "x": event.offsetX, "y": event.offsetY })
+        socket.emit("fill area", { "x": event.offsetX, "y": event.offsetY });
     }
 });
-
 const widthSlider = document.getElementById("line-width-slider");
 widthSlider.addEventListener("input", () => {
     socket.emit("line width change", widthSlider.value);
-})
+});
 const clearButton = document.getElementById("clear-button");
 clearButton.addEventListener("click", () => {
     socket.emit("clear canvas");
-})
-
+});
 let strokeColor = "rgb(0,0,0)";
-let clickedColor = null;
+let clickedColor;
 $(".color-button").on("click", event => {
     // Change border width of previously selected color back to normal
     if (clickedColor != null) {
         clickedColor.classList.remove("selected");
     }
-    strokeColor = $(event.currentTarget).css("background-color") // Set stroke color to color of new box
+    //strokeColor = $(event.currentTarget).css("background-color") // Set stroke color to color of new box
     $(event.currentTarget).addClass("selected"); // Increase border width of current box
     clickedColor = $(event.currentTarget)[0];
-    socket.emit("color change", strokeColor);
+    socket.emit("color change", $(event.currentTarget).css("background-color"));
 });
-
-
 // endregion
 // region Listeners for drawing actions from the server
 socket.on("drawing information request", () => {
     socket.emit("line width change", widthSlider.value);
     socket.emit("color change", strokeColor);
 });
-
 let x = 0;
 let y = 0;
 socket.on("line drawn", (msg) => {
@@ -147,7 +134,7 @@ socket.on("fill area", (msg) => {
     const mouseX = Math.round(msg.x);
     const mouseY = Math.round(msg.y);
     const targetColor = getRGB(strokeColor);
-    const img = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const imgData = img.data;
     console.log(imgData.length);
     const pixelStack = [(mouseX + mouseY * canvas.width) * 4]; // Put first element into pixel stack as index of first value representing a single pixel
@@ -170,7 +157,6 @@ socket.on("fill area", (msg) => {
         let addedRight = false;
         while (currentPixel < imgData.length && colorMatches(currentPixel)) {
             colorPixel(currentPixel);
-
             if (canAddLeft) {
                 const leftPixel = currentPixel - 4;
                 if (colorMatches(leftPixel)) {
@@ -178,7 +164,8 @@ socket.on("fill area", (msg) => {
                         pixelStack.push(leftPixel);
                         addedLeft = true;
                     }
-                } else {
+                }
+                else {
                     addedLeft = false;
                 }
             }
@@ -189,22 +176,20 @@ socket.on("fill area", (msg) => {
                         pixelStack.push(rightPixel);
                         addedRight = true;
                     }
-                } else {
+                }
+                else {
                     addedRight = false;
                 }
             }
-
             currentPixel += canvas.width * 4;
         }
     }
-
     function colorMatches(pixelIndex) {
         //console.log("pixelIndex: "+pixelIndex);
         return imgData[pixelIndex] == startColor[0] &&
             imgData[pixelIndex + 1] == startColor[1] &&
             imgData[pixelIndex + 2] == startColor[2];
     }
-
     function colorPixel(pixelIndex) {
         //console.log("color matches now?"+colorMatches(pixelIndex));
         //console.log("coloring...")
@@ -219,17 +204,18 @@ socket.on("line width change", (newWidth) => {
     ctx.lineWidth = newWidth;
 });
 socket.on("color change", (msg) => {
+    console.log("changing color to " + msg);
     ctx.strokeStyle = msg;
+    strokeColor = msg;
 });
 socket.on("clear canvas", () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (clickedColor != null) {
         clickedColor.classList.remove("selected");
     }
-})
+});
 // endregion
 // endregion
-
 let h1 = document.getElementById("word-bar");
 socket.on("new word", (activeWordLength) => {
     console.log("new word event received by user");
@@ -238,9 +224,7 @@ socket.on("new word", (activeWordLength) => {
         h1.textContent += '_ ';
     }
 });
-
 const userContainer = document.getElementById("users");
-// let activeUser = null;
 socket.on("new user", (userData) => {
     console.log("user data: " + userData);
     // Create name tag
@@ -265,9 +249,11 @@ socket.on("new user", (userData) => {
         if (instruction.action == "line drawn") {
             pfpContext.lineTo(instruction.params.x * widthMultiplier, instruction.params.y * heightMultiplier);
             pfpContext.stroke();
-        } else if (instruction.action == "line moved") {
+        }
+        else if (instruction.action == "line moved") {
             pfpContext.moveTo(instruction.params.x * widthMultiplier, instruction.params.y * heightMultiplier);
-        } else {
+        }
+        else {
             console.log("Instruction " + instruction.action + " is not a valid action");
         }
     }
@@ -278,60 +264,48 @@ socket.on("new user", (userData) => {
     user.appendChild(nickname);
     user.appendChild(score);
 });
-
 socket.on("remove user", (userId) => {
-    document.getElementById(userId).remove();
-})
-
+    const targetUser = document.getElementById(userId);
+    if (targetUser != null) {
+        targetUser.remove();
+    }
+    else {
+        console.log("Cannot remove target user " + userId + " because the element is null");
+    }
+});
 socket.on("new active user", (userInfo) => {
     if (userInfo.hasOwnProperty("prevUser")) {
         const prevUser = userInfo.prevUser;
         if (prevUser != null) {
-            document.getElementById(prevUser).style["background-color"] = "white";
+            document.getElementById(prevUser).style.backgroundColor = "white";
         }
     }
     const newUser = userInfo.newUser;
     if (newUser != null) {
-        document.getElementById(newUser).style["background-color"] = "yellow";
+        document.getElementById(newUser).style.backgroundColor = "yellow";
     }
 });
-
 // Updates the displayed timer
 const timer = document.getElementById("timer");
 socket.on("timer change", (time) => {
-    timer.textContent = time;
+    timer.textContent = time + "";
     if (time == 0) {
         socket.emit("display scores");
     }
 });
-
 // Updates score of a player
 socket.on("score change", (scoreData) => {
     document.querySelector("#" + scoreData.userId + " .score").innerText = "Score: " + scoreData.score;
 });
-
 socket.on('display scores', (lobbyData) => {
     let tempUser = document.createElement('div');
     tempUser.classList.add('tempUser');
     tempUser.textContent = lobbyData.userData.username;
-
     const userList = document.querySelector('.user-list');
     userList.appendChild(tempUser);
-
     const roundPlaceholder = document.getElementById("round-placeholder");
     roundPlaceholder.style.display = "flex";
-
     setTimeout(() => {
         roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
 });
-
-// socket.on("new round", ()=>{
-//     console.log("new round");
-//     document.getElementById("round-placeholder").style.display = "block";
-//     setTimeout(()=>{
-//         document.getElementById("round-placeholder").style.display = "none";
-//     },3000);
-// });
-
-

@@ -1,12 +1,12 @@
 "use strict";
 import {socket} from "./global.js";
 
-const homepage = document.querySelector(".homepage");
-const createOrJoinMenu = document.querySelector(".create-or-join")
-const profileCanvas = document.getElementById("home-canvas");
-const homeInput = document.getElementById("set-username");
+const homepage = <HTMLElement>document.querySelector(".homepage")!;
+const createOrJoinMenu = <HTMLElement>document.querySelector(".create-or-join")!;
+const profileCanvas:HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("home-canvas")!; // Tell typescript that the element is definitely not null
+const homeInput = <HTMLInputElement>document.getElementById("set-username")!;
 
-const ctx = profileCanvas.getContext("2d");
+const ctx = profileCanvas.getContext("2d")!;
 ctx.beginPath();
 ctx.moveTo(0, 0);
 profileCanvas.width = 200;
@@ -21,25 +21,24 @@ document.addEventListener("mouseup", () => {
     mouseDown = false;
 });
 
-let drawActions = []; // Array storing drawing actions done so far
+let drawActions:{action:string, params:{x:number,y:number}}[] = []; // Array storing drawing actions done so far
 profileCanvas.addEventListener("mousemove", (event) => {
-    var rect = event.target.getBoundingClientRect();
     if (mouseDown) {
         /*
         console.log("trying to draw in canvas");
         console.log("mouse x: "+event.clientX+" canvas x: "+rect.left);
         console.log("mouse y: "+event.clientY+" canvas y: "+rect.top);
         */
-        ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+        ctx.lineTo(event.offsetX, event.offsetY);
         ctx.stroke();
-        drawActions.push({ "action": "line drawn", "params": { "x": event.clientX - rect.left, "y": event.clientY - rect.top } });
+        drawActions.push({ "action": "line drawn", "params": { "x": event.offsetX, "y": event.offsetY} });
     } else {
-        ctx.moveTo(event.clientX - rect.left, event.clientY - rect.top);
-        drawActions.push({ "action": "line moved", "params": { "x": event.clientX - rect.left, "y": event.clientY - rect.top } });
+        ctx.moveTo(event.offsetX, event.offsetY);
+        drawActions.push({ "action": "line moved", "params": { "x": event.offsetX, "y": event.offsetY} });
     }
 });
 
-const resetButton = document.getElementById("canvas-reset");
+const resetButton = document.getElementById("canvas-reset")!;
 resetButton.addEventListener("click", () => {
     ctx.closePath();
     ctx.clearRect(0, 0, profileCanvas.width, profileCanvas.height);
@@ -47,7 +46,7 @@ resetButton.addEventListener("click", () => {
     drawActions = []; // Clear drawing actions
 });
 
-const startButton = document.querySelector(".start");
+const startButton = document.querySelector(".start")!;
 startButton.addEventListener('click', () => {
     createOrJoinMenu.style.display = "flex";
     homepage.style.display = "none";

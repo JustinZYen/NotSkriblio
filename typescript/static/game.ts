@@ -4,19 +4,20 @@ import {socket} from "./global.js";
 // Create color buttons
 const colors = ["black", "red", "orange", "yellow", "green", "blue", "purple", "white"];
 class ColorButton {
-    constructor(color) {
-        this.color = color;
-        const item = document.createElement("button");
-        item.classList.add("color-button");
-        item.style.backgroundColor = color;
-        return item;
+    element;
+    constructor(color:string) {
+        //this.color = color;
+        this.element = document.createElement("button");
+        this.element.classList.add("color-button");
+        this.element.style.backgroundColor = color;
     }
+
 }
 
 // Create the various buttons for the colors that you can draw in
-const colorContainer = document.querySelector(".color-container");
+const colorContainer = document.querySelector(".color-container")!;
 for (const color of colors) {
-    colorContainer.appendChild(new ColorButton(color));
+    colorContainer.appendChild(new ColorButton(color).element);
 }
 /*
 colorContainer.appendChild(new ColorButton("black"));
@@ -33,9 +34,9 @@ colorContainer.appendChild(new ColorButton("white"));
 //const colors = colorContainer.children;
 
 // region - Chat message handling
-let form = document.getElementById('form');
-let input = document.getElementById('chat-input');
-let log = document.querySelector('#log');
+let form = document.getElementById('form')!;
+let input = <HTMLInputElement>document.getElementById('chat-input');
+let log = document.querySelector('#log')!;
 // Listening for chat messages from user
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -45,7 +46,7 @@ form.addEventListener('submit', (e) => {
     input.value = '';
 });
 // Listening for chat messages from server
-socket.on('chat message', (msg) => {
+socket.on('chat message', (msg:string) => {
     const item = document.createElement('p');
     item.textContent = msg;
     log.appendChild(item);
@@ -55,8 +56,8 @@ socket.on('chat message', (msg) => {
 
 // region Handling drawing
 // region Begin canvas for drawing on
-const canvas = document.getElementById("my-canvas");
-const ctx = canvas.getContext("2d");
+const canvas = <HTMLCanvasElement>document.getElementById("my-canvas");
+const ctx = canvas.getContext("2d")!;
 canvas.width = 500;
 canvas.height = 500;
 ctx.lineCap = "round";
@@ -76,7 +77,7 @@ canvas.addEventListener("mouseenter", (event) => {
     socket.emit("line moved", { "x": event.offsetX, "y": event.offsetY });
 });
 canvas.addEventListener("mousemove", (event) => {
-    if (mouseDown && !document.getElementById("drawing-type-selector").checked) {
+    if (mouseDown && !(<HTMLInputElement>document.getElementById("drawing-type-selector")).checked) {
         socket.emit("line drawn", { "x": event.offsetX, "y": event.offsetY });
     } else {
         socket.emit("line moved", { "x": event.offsetX, "y": event.offsetY });
@@ -90,31 +91,31 @@ canvas.addEventListener("mouseleave", (event) => {
 })
 
 canvas.addEventListener("click", event => {
-    if (document.getElementById("drawing-type-selector").checked) {
+    if ((<HTMLInputElement>document.getElementById("drawing-type-selector")).checked) {
         socket.emit("fill area", { "x": event.offsetX, "y": event.offsetY })
     }
 });
 
-const widthSlider = document.getElementById("line-width-slider");
+const widthSlider = <HTMLInputElement>document.getElementById("line-width-slider");
 widthSlider.addEventListener("input", () => {
     socket.emit("line width change", widthSlider.value);
 })
-const clearButton = document.getElementById("clear-button");
+const clearButton = document.getElementById("clear-button")!;
 clearButton.addEventListener("click", () => {
     socket.emit("clear canvas");
 })
 
 let strokeColor = "rgb(0,0,0)";
-let clickedColor = null;
+let clickedColor:HTMLButtonElement;
 $(".color-button").on("click", event => {
     // Change border width of previously selected color back to normal
     if (clickedColor != null) {
         clickedColor.classList.remove("selected");
     }
-    strokeColor = $(event.currentTarget).css("background-color") // Set stroke color to color of new box
+    //strokeColor = $(event.currentTarget).css("background-color") // Set stroke color to color of new box
     $(event.currentTarget).addClass("selected"); // Increase border width of current box
-    clickedColor = $(event.currentTarget)[0];
-    socket.emit("color change", strokeColor);
+    clickedColor = <HTMLButtonElement>$(event.currentTarget)[0];
+    socket.emit("color change", $(event.currentTarget).css("background-color"));
 });
 
 
@@ -127,7 +128,7 @@ socket.on("drawing information request", () => {
 
 let x = 0;
 let y = 0;
-socket.on("line drawn", (msg) => {
+socket.on("line drawn", (msg:{x:number,y:number}) => {
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(msg.x, msg.y);
@@ -135,14 +136,14 @@ socket.on("line drawn", (msg) => {
     y = msg.y;
     ctx.stroke();
 });
-socket.on("line moved", (msg) => {
+socket.on("line moved", (msg:{x:number,y:number}) => {
     x = msg.x;
     y = msg.y;
 });
-socket.on("fill area", (msg) => {
-    function getRGB(rgbString) {
+socket.on("fill area", (msg:{x:number,y:number}) => {
+    function getRGB(rgbString:string) {
         // Taken from https://www.30secondsofcode.org/js/s/rgb-to-array-or-object/
-        return rgbString.match(/\d+/g).map(Number);
+        return rgbString.match(/\d+/g)!.map(Number);
     }
     const mouseX = Math.round(msg.x);
     const mouseY = Math.round(msg.y);
@@ -151,14 +152,14 @@ socket.on("fill area", (msg) => {
     const imgData = img.data;
     console.log(imgData.length);
     const pixelStack = [(mouseX + mouseY * canvas.width) * 4]; // Put first element into pixel stack as index of first value representing a single pixel
-    const startColor = imgData.slice(pixelStack[0], pixelStack[0] + 3);
+    const startColor = imgData.slice(pixelStack[0], pixelStack[0]! + 3);
     if (targetColor[0] == startColor[0] && targetColor[1] == startColor[1] && targetColor[2] == startColor[2]) {
         console.log("target color matches start color!");
         return;
     }
     console.log("start color: " + startColor);
     while (pixelStack.length > 0) {
-        let currentPixel = pixelStack.pop();
+        let currentPixel = pixelStack.pop()!;
         let higherPixel = currentPixel - canvas.width * 4; // Get pixel exactly above current pixel
         while (higherPixel > 0 && colorMatches(higherPixel)) {
             currentPixel = higherPixel;
@@ -198,28 +199,30 @@ socket.on("fill area", (msg) => {
         }
     }
 
-    function colorMatches(pixelIndex) {
+    function colorMatches(pixelIndex:number) {
         //console.log("pixelIndex: "+pixelIndex);
         return imgData[pixelIndex] == startColor[0] &&
             imgData[pixelIndex + 1] == startColor[1] &&
             imgData[pixelIndex + 2] == startColor[2];
     }
 
-    function colorPixel(pixelIndex) {
+    function colorPixel(pixelIndex:number) {
         //console.log("color matches now?"+colorMatches(pixelIndex));
         //console.log("coloring...")
-        imgData[pixelIndex] = targetColor[0];
-        imgData[pixelIndex + 1] = targetColor[1];
-        imgData[pixelIndex + 2] = targetColor[2];
+        imgData[pixelIndex] = targetColor[0]!;
+        imgData[pixelIndex + 1] = targetColor[1]!;
+        imgData[pixelIndex + 2] = targetColor[2]!;
         //console.log("color still matches?"+colorMatches(pixelIndex));
     }
     ctx.putImageData(img, 0, 0);
 });
-socket.on("line width change", (newWidth) => {
+socket.on("line width change", (newWidth:number) => {
     ctx.lineWidth = newWidth;
 });
-socket.on("color change", (msg) => {
+socket.on("color change", (msg:string) => {
+    console.log("changing color to "+msg);
     ctx.strokeStyle = msg;
+    strokeColor = msg;
 });
 socket.on("clear canvas", () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -230,8 +233,8 @@ socket.on("clear canvas", () => {
 // endregion
 // endregion
 
-let h1 = document.getElementById("word-bar");
-socket.on("new word", (activeWordLength) => {
+let h1 = document.getElementById("word-bar")!;
+socket.on("new word", (activeWordLength:number) => {
     console.log("new word event received by user");
     h1.textContent = '';
     for (let i = 0; i < activeWordLength; i++) {
@@ -239,9 +242,20 @@ socket.on("new word", (activeWordLength) => {
     }
 });
 
-const userContainer = document.getElementById("users");
+const userContainer = document.getElementById("users")!;
 // let activeUser = null;
-socket.on("new user", (userData) => {
+type userData = {id:string,
+    username:string,
+    profilePicture:{
+        width:number,
+        height:number,
+        drawActions:{
+            action:string,
+            params:{
+                x: number,
+                y:number,
+            }}[]}};
+socket.on("new user", (userData:userData) => {
     console.log("user data: " + userData);
     // Create name tag
     const user = document.createElement("div");
@@ -253,7 +267,7 @@ socket.on("new user", (userData) => {
     userContainer.appendChild(user);
     // Create profile picture
     const pfp = document.createElement("canvas");
-    const pfpContext = pfp.getContext("2d");
+    const pfpContext = pfp.getContext("2d")!;
     pfpContext.beginPath();
     pfpContext.moveTo(0, 0);
     pfp.width = 50;
@@ -279,46 +293,52 @@ socket.on("new user", (userData) => {
     user.appendChild(score);
 });
 
-socket.on("remove user", (userId) => {
-    document.getElementById(userId).remove();
+socket.on("remove user", (userId:string) => {
+    const targetUser = document.getElementById(userId)
+    if (targetUser != null) {
+        targetUser.remove();
+
+    } else {
+        console.log("Cannot remove target user "+userId+ " because the element is null")
+    }
 })
 
-socket.on("new active user", (userInfo) => {
+socket.on("new active user", (userInfo:{prevUser:string,newUser:string}) => {
     if (userInfo.hasOwnProperty("prevUser")) {
         const prevUser = userInfo.prevUser;
         if (prevUser != null) {
-            document.getElementById(prevUser).style["background-color"] = "white";
+            document.getElementById(prevUser)!.style.backgroundColor = "white";
         }
     }
     const newUser = userInfo.newUser;
     if (newUser != null) {
-        document.getElementById(newUser).style["background-color"] = "yellow";
+        document.getElementById(newUser)!.style.backgroundColor = "yellow";
     }
 });
 
 // Updates the displayed timer
-const timer = document.getElementById("timer");
-socket.on("timer change", (time) => {
-    timer.textContent = time;
+const timer = document.getElementById("timer")!;
+socket.on("timer change", (time:number) => {
+    timer.textContent = time+"";
     if (time == 0) {
         socket.emit("display scores");
     }
 });
 
 // Updates score of a player
-socket.on("score change", (scoreData) => {
-    document.querySelector("#" + scoreData.userId + " .score").innerText = "Score: " + scoreData.score;
+socket.on("score change", (scoreData:{userId:string, score:number}) => {
+    (<HTMLElement>document.querySelector("#" + scoreData.userId + " .score")).innerText = "Score: " + scoreData.score;
 });
 
-socket.on('display scores', (lobbyData) => {
+socket.on('display scores', (lobbyData:{userData:{username:string},BETWEEN_ROUNDS_MS:number}) => {
     let tempUser = document.createElement('div');
     tempUser.classList.add('tempUser');
     tempUser.textContent = lobbyData.userData.username;
 
-    const userList = document.querySelector('.user-list');
+    const userList = document.querySelector('.user-list')!;
     userList.appendChild(tempUser);
 
-    const roundPlaceholder = document.getElementById("round-placeholder");
+    const roundPlaceholder = document.getElementById("round-placeholder")!;
     roundPlaceholder.style.display = "flex";
 
     setTimeout(() => {

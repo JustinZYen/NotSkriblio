@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { Server } from 'socket.io';
-import { time } from 'node:console';
+//import { time } from 'node:console';
 import { Room } from './room.js'
 
 const app = express();
@@ -28,7 +28,7 @@ let activeWord = null;
 */
 
 
-const rooms = new Map(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, 
+const rooms = new Map<string,Room>(); // Map room names to an object with {"activeUser":<username>, "activeWord":<word>, 
 //"users":<user set/map>, "canvasEvents":<array of canvas events>, "time":<current time>}
 addRoom("Room 1");
 io.on('connection', (socket) => {
@@ -36,11 +36,11 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit("new room", roomName);
   }
   // Initial connection actions
-  const userData = { "id": socket.id, "username": "User" + socket.id.substring(0, 3), "profilePicture": {} };
+  const userData = { "id": socket.id, "username": "User" + socket.id.substring(0, 3), "profilePicture": {}, score:-1 };
   socket.on("set username", (msg) => {
     setUsername(msg);
   })
-  function setUsername(newName) {
+  function setUsername(newName:string) {
     //console.log("set username received");
     if (newName != "") {
       userData.username = newName;
@@ -71,10 +71,10 @@ io.on('connection', (socket) => {
     if (!rooms.has(roomName)) {
       addRoom(roomName);
     }
-    const currentRoom = rooms.get(roomName);
+    const currentRoom = rooms.get(roomName)!;
 
     // Load the users that are currently in the room
-    for (const [_, username] of currentRoom.users) {
+    for (const [_, userData] of currentRoom.users) {
       io.to(socket.id).emit("new user", userData);
     }
 
@@ -114,7 +114,7 @@ io.on('connection', (socket) => {
     socket.on('chat message', (msg) => {
       msg = msg.trim();
       if (socket.id != currentRoom.activeUser && msg.toLowerCase() == currentRoom.activeWord) {
-        currentRoom.wordGuessed(socket.id, time);
+        currentRoom.wordGuessed(socket.id);
         io.to(socket.id).emit("chat message", "You guessed the word!");
         //currentRoom.setActiveUser(socket.id);
       } else {
@@ -158,7 +158,7 @@ io.on('connection', (socket) => {
   })
 });
 
-function addRoom(roomName) {
+function addRoom(roomName:string) {
   const activeRoom = new Room(roomName, io);
   rooms.set(roomName, activeRoom);
 }

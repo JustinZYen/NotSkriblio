@@ -1,28 +1,29 @@
 import fs from 'fs';
+import { Server } from 'socket.io';
 
-let wordArr = [];
+let wordArr:string[] = [];
 fs.readFile('static/words.txt', (err, data) => {
   if (err) throw err;
   wordArr = data.toString().split(/[\r\n]+/);
   //console.log(data.toString().split(/[\r\n]+/));
 });
-
+type userDataType = {id:string, username:string, profilePicture:{}, score:number}
 class Room {
     static MAX_TIME = 10;
     static MAX_ROUNDS = 3;
     static MIN_PLAYERS = 1; // Need 3 players to start the game
     static BETWEEN_ROUNDS_MS = 5000;
     currentRound = 0;
-    activeUser = null;
+    activeUser:string|null = null;
     activeWord = "";
-    users = new Map(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
-    canvasEvents = [];
-    timer = null;
+    users = new Map<string,userDataType>(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
+    canvasEvents:{action:string,params?:{x:number,y:number}}[] = [];
+    timer:NodeJS.Timeout;
     time = Room.MAX_TIME;
     roomName;
     gameStarted = false;
     io; // socketio Server object
-    constructor(roomName, io) {
+    constructor(roomName:string, io:Server) {
         this.roomName = roomName;
         this.io = io;
         /*
@@ -37,7 +38,7 @@ class Room {
         */
     }
 
-    addUser(userId, userData) {
+    addUser(userId:string, userData:userDataType) {
         userData.score = 0; // Add score field once user has joined a game
         console.log("user data being emitted is: " + Object.keys(userData.profilePicture));
         this.io.to(this.roomName).emit("new user", userData);
@@ -52,7 +53,7 @@ class Room {
         // Check if there are now enough users to start the game
     }
 
-    removeUser(userId) {
+    removeUser(userId:string) {
         this.users.delete(userId);
         this.io.to(this.roomName).emit("remove user", userId);
         if (userId == this.activeUser) {
@@ -61,16 +62,18 @@ class Room {
                 this.activeUser = null;
             } else {
                 const [first] = this.users; // This gets the first element of the map as an array of key + value
-                this.setActiveUser(first[0]); // Set active user to id of first user
-                console.log("new user is: " + this.activeUser);
+                if (first != null) {
+                    this.setActiveUser(first[0]); // Set active user to id of first user
+                    console.log("new user is: " + this.activeUser);
+                }
             }
         }
     }
 
-    setActiveUser(userId) {
-        const getWord = () => {
+    setActiveUser(userId:string) {
+        const getWord = ():string => {
             let val = Math.floor(Math.random() * wordArr.length);
-            return wordArr[val];
+            return wordArr[val]!; // Exclamation mark tells typescript that there is definitely a value
         }
         const previousUser = this.activeUser;
         this.activeUser = userId;
@@ -98,8 +101,12 @@ class Room {
                     this.setActiveUser(iterNext[0]);
                 } else {
                     const [first] = this.users; // This gets the first element of the map as an array of key + value
-                    this.setActiveUser(first[0]);
-                    this.nextRound();
+                    if (first != undefined) {
+                        this.setActiveUser(first[0]);
+                        this.nextRound();
+                    } else {
+                        console.log("First user is undefined")
+                    }
                 }
             }
         }
@@ -140,7 +147,7 @@ class Room {
         }
     }
 
-    wordGuessed(userId) {
+    wordGuessed(userId:string) {
         if (this.gameStarted) {
             // Player who guessed the word gets points
             // Pass active player to the next person
@@ -151,7 +158,7 @@ class Room {
         }
     }
 
-    addScore(userId) {
+    addScore(userId:string) {
         let points = 500 - (Room.MAX_TIME - this.time) * 5;
         // Gain 500 points for guessing instantly and -5 points for every extra second it takes to guess
         // Drawer gains a quarter of the number of points the guesser gained
@@ -160,11 +167,11 @@ class Room {
         // this.io.to(userId).emit('update points', points);
         // this.io.to(this.activeUser).emit('update points', points);
 
-        this.users.get(userId).score += points;
-        this.users.get(this.activeUser).score += Math.floor(points / 4);
+        this.users.get(userId)!.score += points;
+        this.users.get(this.activeUser!)!.score += Math.floor(points / 4);
 
-        this.io.to(this.roomName).emit("score change", { "userId": userId, "score": this.users.get(userId).score });
-        this.io.to(this.roomName).emit("score change", { "userId": this.activeUser, "score": this.users.get(this.activeUser).score });
+        this.io.to(this.roomName).emit("score change", { "userId": userId, "score": this.users.get(userId)!.score });
+        this.io.to(this.roomName).emit("score change", { "userId": this.activeUser, "score": this.users.get(this.activeUser!)!.score });
     }
 }
 
