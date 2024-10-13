@@ -12,7 +12,7 @@ const io = new Server(server);
 
 // Set up associated files
 const __dirname = dirname(fileURLToPath(import.meta.url));
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.sendFile(join(__dirname, 'index.html'));
 });
 app.use(express.static(join(__dirname, 'static/')));
@@ -117,8 +117,7 @@ io.on('connection', (socket) => {
 
     socket.on('display scores', () => {
       for (const [_, userData] of currentRoom.users) {
-        console.log(userData);
-        io.to(roomName).emit('display scores', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
+        io.to(socket.id).emit('display users', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
       }
     });
 

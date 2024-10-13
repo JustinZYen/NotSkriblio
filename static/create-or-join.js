@@ -14,4 +14,3 @@ joinLobby.addEventListener("click", () => {
     lobby.style.display = "flex";
     createOrJoinMenu.style.display = "none";
 });
-export {};

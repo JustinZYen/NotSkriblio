@@ -295,9 +295,9 @@ socket.on("timer change", (time) => {
 });
 // Updates score of a player
 socket.on("score change", (scoreData) => {
-    (document.getElementById(scoreData.userId)?.querySelector(".score")).innerText = "Score: " + scoreData.score;
+    (document.getElementById(scoreData.userId)?.querySelector(".score")).textContent = "Score: " + scoreData.score;
 });
-socket.on('display scores', (lobbyData) => {
+socket.on('display users', (lobbyData) => {
     let tempUser = document.createElement('div');
     tempUser.classList.add('tempUser');
     tempUser.textContent = lobbyData.userData.username;
@@ -306,7 +306,7 @@ socket.on('display scores', (lobbyData) => {
     const roundPlaceholder = document.getElementById("round-placeholder");
     roundPlaceholder.style.display = "flex";
     setTimeout(() => {
-        userList.textContent = "";
+        userList.replaceChildren();
         roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
 });

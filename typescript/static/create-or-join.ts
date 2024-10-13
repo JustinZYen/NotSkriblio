@@ -1,6 +1,5 @@
 "use strict";
 
-import {socket} from "./global.js";
 const lobby = document.getElementById("lobby")!;
 const lobbyCreator = document.getElementById("lobby-creator")!;
 const createOrJoinMenu = <HTMLElement>document.querySelector(".create-or-join")!

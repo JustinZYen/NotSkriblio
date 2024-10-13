@@ -328,10 +328,10 @@ socket.on("timer change", (time:number) => {
 
 // Updates score of a player
 socket.on("score change", (scoreData:{userId:string, score:number}) => {
-    (<HTMLElement>document.getElementById(scoreData.userId)?.querySelector(".score")).innerText = "Score: " + scoreData.score;
+    (<HTMLElement>document.getElementById(scoreData.userId)?.querySelector(".score")).textContent = "Score: " + scoreData.score;
 });
 
-socket.on('display scores', (lobbyData:{userData:{username:string},BETWEEN_ROUNDS_MS:number}) => {
+socket.on('display users', (lobbyData:{userData:userData,BETWEEN_ROUNDS_MS:number}) => {
     let tempUser = document.createElement('div');
     tempUser.classList.add('tempUser');
     tempUser.textContent = lobbyData.userData.username;
@@ -343,7 +343,7 @@ socket.on('display scores', (lobbyData:{userData:{username:string},BETWEEN_ROUND
     roundPlaceholder.style.display = "flex";
 
     setTimeout(() => {
-        userList.textContent = "";
+        userList.replaceChildren();
         roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
 });
