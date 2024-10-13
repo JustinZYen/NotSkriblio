@@ -7,7 +7,18 @@ fs.readFile('static/words.txt', (err, data) => {
   wordArr = data.toString().split(/[\r\n]+/);
   //console.log(data.toString().split(/[\r\n]+/));
 });
-type userDataType = {id:string, username:string, profilePicture:{}, score:number}
+type userData = {id:string,
+    username:string,
+    profilePicture:{
+        width:number,
+        height:number,
+        drawActions:{
+            action:string,
+            params:{
+                x: number,
+                y:number,
+            }}[]}
+    score:number};
 class Room {
     static MAX_TIME = 10;
     static MAX_ROUNDS = 3;
@@ -16,7 +27,7 @@ class Room {
     currentRound = 0;
     activeUser:string|null = null;
     activeWord = "";
-    users = new Map<string,userDataType>(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
+    users = new Map<string,userData>(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
     canvasEvents:{action:string,params?:{x:number,y:number}}[] = [];
     timer:NodeJS.Timeout;
     time = Room.MAX_TIME;
@@ -38,7 +49,7 @@ class Room {
         */
     }
 
-    addUser(userId:string, userData:userDataType) {
+    addUser(userId:string, userData:userData) {
         userData.score = 0; // Add score field once user has joined a game
         console.log("user data being emitted is: " + Object.keys(userData.profilePicture));
         this.io.to(this.roomName).emit("new user", userData);

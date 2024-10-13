@@ -36,7 +36,19 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit("new room", roomName);
   }
   // Initial connection actions
-  const userData = { "id": socket.id, "username": "User" + socket.id.substring(0, 3), "profilePicture": {}, score:-1 };
+  type userData = {id:string,
+    username:string,
+    profilePicture:{
+        width:number,
+        height:number,
+        drawActions:{
+            action:string,
+            params:{
+                x: number,
+                y:number,
+            }}[]}
+    score:number};
+  const userData:userData = { "id": socket.id, "username": "User" + socket.id.substring(0, 3), "profilePicture": {width:-1,height:-1,drawActions:[]}, score:-1 };
   socket.on("set username", (msg) => {
     setUsername(msg);
   })

@@ -29,8 +29,7 @@ io.on('connection', (socket) => {
     for (const [roomName, _] of rooms) {
         io.to(socket.id).emit("new room", roomName);
     }
-    // Initial connection actions
-    const userData = { "id": socket.id, "username": "User" + socket.id.substring(0, 3), "profilePicture": {}, score: -1 };
+    const userData = { "id": socket.id, "username": "User" + socket.id.substring(0, 3), "profilePicture": { width: -1, height: -1, drawActions: [] }, score: -1 };
     socket.on("set username", (msg) => {
         setUsername(msg);
     });

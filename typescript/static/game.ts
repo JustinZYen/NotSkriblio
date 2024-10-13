@@ -254,7 +254,8 @@ type userData = {id:string,
             params:{
                 x: number,
                 y:number,
-            }}[]}};
+            }}[]}
+    score:number};
 socket.on("new user", (userData:userData) => {
     console.log("user data: " + userData);
     // Create name tag
@@ -287,7 +288,7 @@ socket.on("new user", (userData:userData) => {
     }
     const score = document.createElement("p");
     score.classList.add("score");
-    score.innerText = "Score: 0";
+    score.innerText = "Score: "+userData.score;
     user.appendChild(pfp);
     user.appendChild(nickname);
     user.appendChild(score);
@@ -327,7 +328,7 @@ socket.on("timer change", (time:number) => {
 
 // Updates score of a player
 socket.on("score change", (scoreData:{userId:string, score:number}) => {
-    (<HTMLElement>document.querySelector("#" + scoreData.userId + " .score")).innerText = "Score: " + scoreData.score;
+    (<HTMLElement>document.getElementById(scoreData.userId)?.querySelector(".score")).innerText = "Score: " + scoreData.score;
 });
 
 socket.on('display scores', (lobbyData:{userData:{username:string},BETWEEN_ROUNDS_MS:number}) => {
@@ -342,6 +343,7 @@ socket.on('display scores', (lobbyData:{userData:{username:string},BETWEEN_ROUND
     roundPlaceholder.style.display = "flex";
 
     setTimeout(() => {
+        userList.textContent = "";
         roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
 });

@@ -259,7 +259,7 @@ socket.on("new user", (userData) => {
     }
     const score = document.createElement("p");
     score.classList.add("score");
-    score.innerText = "Score: 0";
+    score.innerText = "Score: " + userData.score;
     user.appendChild(pfp);
     user.appendChild(nickname);
     user.appendChild(score);
@@ -295,7 +295,7 @@ socket.on("timer change", (time) => {
 });
 // Updates score of a player
 socket.on("score change", (scoreData) => {
-    document.querySelector("#" + scoreData.userId + " .score").innerText = "Score: " + scoreData.score;
+    (document.getElementById(scoreData.userId)?.querySelector(".score")).innerText = "Score: " + scoreData.score;
 });
 socket.on('display scores', (lobbyData) => {
     let tempUser = document.createElement('div');
@@ -306,6 +306,7 @@ socket.on('display scores', (lobbyData) => {
     const roundPlaceholder = document.getElementById("round-placeholder");
     roundPlaceholder.style.display = "flex";
     setTimeout(() => {
+        userList.textContent = "";
         roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
 });
