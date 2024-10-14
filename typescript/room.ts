@@ -130,6 +130,9 @@ class Room {
             this.io.to(this.roomName).emit("timer change", this.time);
             if (this.time == 0) {
                 this.time = Room.MAX_TIME;
+                for (const [_,userData] of this.users) {
+                    this.io.to(this.roomName).emit("display users",{userData:userData,BETWEEN_ROUNDS_MS:Room.BETWEEN_ROUNDS_MS});
+                }
                 this.resetTimer();
             }
             this.time--;

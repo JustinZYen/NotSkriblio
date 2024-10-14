@@ -321,9 +321,6 @@ socket.on("new active user", (userInfo:{prevUser:string,newUser:string}) => {
 const timer = document.getElementById("timer")!;
 socket.on("timer change", (time:number) => {
     timer.textContent = time+"";
-    if (time == 0) {
-        socket.emit("display scores");
-    }
 });
 
 // Updates score of a player
@@ -331,7 +328,7 @@ socket.on("score change", (scoreData:{userId:string, score:number}) => {
     (<HTMLElement>document.getElementById(scoreData.userId)?.querySelector(".score")).textContent = "Score: " + scoreData.score;
 });
 
-socket.on('display users', (lobbyData:{userData:userData,BETWEEN_ROUNDS_MS:number}) => {
+socket.on('display scores', (lobbyData:{userData:userData,BETWEEN_ROUNDS_MS:number}) => {
     let tempUser = document.createElement('div');
     tempUser.classList.add('tempUser');
     tempUser.textContent = lobbyData.userData.username;

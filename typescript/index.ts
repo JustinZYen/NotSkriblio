@@ -117,7 +117,7 @@ io.on('connection', (socket) => {
 
     socket.on('display scores', () => {
       for (const [_, userData] of currentRoom.users) {
-        io.to(socket.id).emit('display users', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
+        io.to(socket.id).emit('display scores', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
       }
     });
 
