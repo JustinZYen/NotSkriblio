@@ -11,5 +11,8 @@
     "devDependencies": {
         "@types/express": "^5.0.0",
         "@types/jquery": "^3.5.31"
+    },
+    "scripts": {
+        "start": "tsc && node index.js"
     }
 }

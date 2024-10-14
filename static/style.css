@@ -230,6 +230,10 @@ li {
   overflow-y: auto;
 }
 
+#users .me {
+  font-weight:bold;
+}
+
 #my-canvas{
   border: solid 2px black;
   margin-left: -2px;
@@ -350,23 +354,28 @@ form p:nth-child(odd) {
 
 /* New round screen */
 #round-placeholder {
+  display: flex;
+  flex-direction: column;
   position:absolute;
   pointer-events:none;
   top:0;
   left:0;
-  opacity: 50%;
-  background-color:gray;
-  padding: 3ch;
+  background-color:var(--transition-bkrd);
   height:100%;
   width:100%;
 }
-/* 
-#round-placeholder .body {
+
+#round-placeholder header {
+  width: 100%;
+  background-color: white;
+  padding: 1.5rem;
+  color: black;
   display: flex;
-  height: 50vh;
-  width: 50vw;
-  border: solid red;
-} */
+  justify-content: center;
+  font-size: 3ch;
+}
+
+
 
 .tempUser {
   border: solid red;

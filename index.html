@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
@@ -31,6 +32,7 @@
   </div>
 
   <div class="create-or-join" style="display: none">
+    <button class="back-button">Back</button>
     <div class="center-container">
       <button class="create-lobby">Create a New Lobby</button>
       <button class="join-lobby">Join Lobby</button>
@@ -86,9 +88,10 @@
   </div>
 
   <div id="round-placeholder" style="display:none">
-    <div class="body"></div>
-    <h4>Scoreboard:</h4>
-    <div class="user-list"></div>
+    <header>Scoreboard</header>
+    <div class="body">
+      <div class="user-list"></div>
+    </div>
   </div>
 </body>
 </html>

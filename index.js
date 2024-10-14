@@ -75,6 +75,8 @@ io.on('connection', (socket) => {
         io.to(roomName).emit('chat message', userData.username + ' joined the room');
         // Add current user into users list
         currentRoom.addUser(socket.id, userData);
+        // Tell new user which user id they are
+        io.to(socket.id).emit("you are", socket.id);
         // Load in underscores representing new empty word
         if (currentRoom.activeWord.length > 0) {
             io.to(socket.id).emit("new word", currentRoom.activeWord.length);
@@ -84,11 +86,13 @@ io.on('connection', (socket) => {
             io.to(roomName).emit('chat message', userData.username + ' left the room');
             currentRoom.removeUser(socket.id);
         });
+        /*
         socket.on('display scores', () => {
-            for (const [_, userData] of currentRoom.users) {
-                io.to(socket.id).emit('display users', { 'userData': userData, 'BETWEEN_ROUNDS_MS': Room.BETWEEN_ROUNDS_MS });
-            }
+          for (const [_, userData] of currentRoom.users) {
+            io.to(socket.id).emit('display scores', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
+          }
         });
+        */
         console.log("user with id " + socket.id + " joined room with name " + roomName);
         socket.on('chat message', (msg) => {
             msg = msg.trim();

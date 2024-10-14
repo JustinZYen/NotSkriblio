@@ -294,6 +294,10 @@ socket.on("new user", (userData:userData) => {
     user.appendChild(score);
 });
 
+socket.on("you are",(myId:string)=>{
+    document.getElementById(myId)?.classList.add("me")
+});
+
 socket.on("remove user", (userId:string) => {
     const targetUser = document.getElementById(userId)
     if (targetUser != null) {
@@ -328,11 +332,10 @@ socket.on("score change", (scoreData:{userId:string, score:number}) => {
     (<HTMLElement>document.getElementById(scoreData.userId)?.querySelector(".score")).textContent = "Score: " + scoreData.score;
 });
 
-socket.on('display scores', (lobbyData:{userData:userData,BETWEEN_ROUNDS_MS:number}) => {
+socket.on('display scores', (lobbyData:{userData:userData, BETWEEN_ROUNDS_MS:number}) => {
     let tempUser = document.createElement('div');
     tempUser.classList.add('tempUser');
     tempUser.textContent = lobbyData.userData.username;
-
     const userList = document.querySelector('.user-list')!;
     userList.appendChild(tempUser);
 
@@ -344,13 +347,5 @@ socket.on('display scores', (lobbyData:{userData:userData,BETWEEN_ROUNDS_MS:numb
         roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
 });
-
-// socket.on("new round", ()=>{
-//     console.log("new round");
-//     document.getElementById("round-placeholder").style.display = "block";
-//     setTimeout(()=>{
-//         document.getElementById("round-placeholder").style.display = "none";
-//     },3000);
-// });
 
 

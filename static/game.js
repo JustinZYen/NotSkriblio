@@ -264,6 +264,9 @@ socket.on("new user", (userData) => {
     user.appendChild(nickname);
     user.appendChild(score);
 });
+socket.on("you are", (myId) => {
+    document.getElementById(myId)?.classList.add("me");
+});
 socket.on("remove user", (userId) => {
     const targetUser = document.getElementById(userId);
     if (targetUser != null) {
@@ -289,15 +292,12 @@ socket.on("new active user", (userInfo) => {
 const timer = document.getElementById("timer");
 socket.on("timer change", (time) => {
     timer.textContent = time + "";
-    if (time == 0) {
-        socket.emit("display scores");
-    }
 });
 // Updates score of a player
 socket.on("score change", (scoreData) => {
     (document.getElementById(scoreData.userId)?.querySelector(".score")).textContent = "Score: " + scoreData.score;
 });
-socket.on('display users', (lobbyData) => {
+socket.on('display scores', (lobbyData) => {
     let tempUser = document.createElement('div');
     tempUser.classList.add('tempUser');
     tempUser.textContent = lobbyData.userData.username;
