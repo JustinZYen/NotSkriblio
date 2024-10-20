@@ -1,14 +1,12 @@
 "use strict";
 
-const lobby = document.getElementById("lobby")!;
-const lobbyCreator = document.getElementById("lobby-creator")!;
-const createOrJoinMenu = <HTMLElement>document.querySelector(".create-or-join")!
+import {lobbyCreator,lobby,createOrJoinMenu,homepage} from "./global.js"
 
 // Listen for back button being clicked
 const backButton = createOrJoinMenu.querySelector(".back-button")!;
 backButton.addEventListener("click", ()=>{
     createOrJoinMenu.style.display = "none";
-    (<HTMLElement>document.querySelector(".homepage")).style.display = "flex";
+    homepage.style.display = "flex";
 })
 
 // Listen for choice to create a new lobby

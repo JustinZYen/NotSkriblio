@@ -1,7 +1,5 @@
 "use strict";
-import { socket } from "./global.js";
-const homepage = document.querySelector(".homepage");
-const createOrJoinMenu = document.querySelector(".create-or-join");
+import { socket, homepage, createOrJoinMenu } from "./global.js";
 const profileCanvas = document.getElementById("home-canvas"); // Tell typescript that the element is definitely not null
 const homeInput = document.getElementById("set-username");
 const ctx = profileCanvas.getContext("2d");

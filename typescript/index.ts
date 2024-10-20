@@ -117,14 +117,7 @@ io.on('connection', (socket) => {
       io.to(roomName).emit('chat message', userData.username + ' left the room');
       currentRoom.removeUser(socket.id);
     });
-
-    /*
-    socket.on('display scores', () => {
-      for (const [_, userData] of currentRoom.users) {
-        io.to(socket.id).emit('display scores', {'userData':userData, 'BETWEEN_ROUNDS_MS':Room.BETWEEN_ROUNDS_MS});
-      }
-    });
-    */
+    
     console.log("user with id " + socket.id + " joined room with name " + roomName);
     socket.on('chat message', (msg) => {
       msg = msg.trim();
