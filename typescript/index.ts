@@ -5,7 +5,6 @@ import { dirname, join } from 'node:path';
 import { Server } from 'socket.io';
 //import { time } from 'node:console';
 import { Room } from './room.js'
-
 const app = express();
 const server = createServer(app);
 const io = new Server(server);

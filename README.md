@@ -12,3 +12,4 @@ Plans for changes:
 - Make clicking without dragging on the canvas draw a circle
 Bugs:
 - Lobbies can be abused by manually changing view of the page to join lobbies repeatedly
+- If the active user leaves the game, the next user becomes the active user but with the now-lowered timer duration

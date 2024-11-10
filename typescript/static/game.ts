@@ -304,7 +304,7 @@ socket.on("remove user", (userId:string) => {
         targetUser.remove();
 
     } else {
-        console.log("Cannot remove target user "+userId+ " because the element is null")
+        console.log("Cannot remove target user " + userId + " because the element is null")
     }
 })
 
