@@ -375,9 +375,17 @@ form p:nth-child(odd) {
   font-size: 3ch;
 }
 
-
-
 .tempUser {
   border: solid red;
 }
 
+#round-placeholder body {
+  display: grid;
+  grid-template-areas:
+    "current-winner score";
+}
+
+#round-placeholder .current-winner {
+  grid-area: "current-winner";
+  border: solid red;
+}

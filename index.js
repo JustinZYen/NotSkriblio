@@ -62,15 +62,15 @@ io.on('connection', (socket) => {
         }
         const currentRoom = rooms.get(roomName);
         // Load the users that are currently in the room
-        for (const [_, userData] of currentRoom.users) {
-            io.to(socket.id).emit("new user", userData);
+        for (const [_, currentUser] of currentRoom.users.users) {
+            io.to(socket.id).emit("new user", currentUser.userData);
         }
         // Draw all current drawing actions
         for (const canvasEvent of currentRoom.canvasEvents) {
             io.to(socket.id).emit(canvasEvent.action, canvasEvent.params);
         }
         // Highlight the active user
-        io.to(socket.id).emit("new active user", { newUser: currentRoom.activeUser });
+        io.to(socket.id).emit("new active user", { newUser: currentRoom.getActiveUser() });
         // Send a message to everyone that a new user has joined
         io.to(roomName).emit('chat message', userData.username + ' joined the room');
         // Add current user into users list
@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
         console.log("user with id " + socket.id + " joined room with name " + roomName);
         socket.on('chat message', (msg) => {
             msg = msg.trim();
-            if (socket.id != currentRoom.activeUser && msg.toLowerCase() == currentRoom.activeWord) {
+            if (socket.id != currentRoom.getActiveUser() && msg.toLowerCase() == currentRoom.activeWord) {
                 currentRoom.wordGuessed(socket.id);
                 io.to(socket.id).emit("chat message", "You guessed the word!");
                 //currentRoom.setActiveUser(socket.id);
@@ -99,31 +99,31 @@ io.on('connection', (socket) => {
             }
         });
         socket.on("line drawn", (msg) => {
-            if (socket.id == currentRoom.activeUser) {
+            if (socket.id == currentRoom.getActiveUser()) {
                 io.to(roomName).emit('line drawn', msg);
                 currentRoom.canvasEvents.push({ "action": "line drawn", "params": msg });
             }
         });
         socket.on("line moved", (msg) => {
-            if (socket.id == currentRoom.activeUser) {
+            if (socket.id == currentRoom.getActiveUser()) {
                 io.to(roomName).emit('line moved', msg);
                 currentRoom.canvasEvents.push({ "action": "line moved", "params": msg });
             }
         });
         socket.on("fill area", (msg) => {
-            if (socket.id == currentRoom.activeUser) {
+            if (socket.id == currentRoom.getActiveUser()) {
                 io.to(roomName).emit('fill area', msg);
                 currentRoom.canvasEvents.push({ "action": "fill area", "params": msg });
             }
         });
         socket.on("line width change", (newWidth) => {
-            if (socket.id == currentRoom.activeUser) {
+            if (socket.id == currentRoom.getActiveUser()) {
                 io.to(roomName).emit('line width change', newWidth);
                 currentRoom.canvasEvents.push({ "action": "line width change", "params": newWidth });
             }
         });
         socket.on("color change", (msg) => {
-            if (socket.id == currentRoom.activeUser) {
+            if (socket.id == currentRoom.getActiveUser()) {
                 io.to(roomName).emit('color change', msg);
                 currentRoom.canvasEvents.push({ "action": "color change", "params": msg });
             }

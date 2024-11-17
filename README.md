@@ -13,3 +13,4 @@ Plans for changes:
 Bugs:
 - Lobbies can be abused by manually changing view of the page to join lobbies repeatedly
 - If the active user leaves the game, the next user becomes the active user but with the now-lowered timer duration
+- If game runs for too long, timer counts down far too quickly
