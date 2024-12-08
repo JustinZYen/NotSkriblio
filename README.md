@@ -1,7 +1,10 @@
 # NotSkribblio
+
 Webpage available at: https://notskriblio.onrender.com/
 
-Remake of the web game Skribbl.io using Socket.io for simultaneous two-way communication and Express.JS for backend
+**!!! Please be patient, the server takes some time to start up after a period of inactivity !!!**
+
+Notskribbl.io is an online multiplayer game inspired by the popular drawing and guessing game Skribbl.io. In Notskribbl.io, players take turns drawing prompts while other participants attempt to guess what is being drawn. The objective of the game is to score points based on how quickly and accurately the players guess the drawings.
 
 ![Image ingame](./notskriblio_apple.png)
 
