@@ -1,5 +1,19 @@
-FIRE IN THE HOLE
+# NotSkribblio
 Webpage available at: https://notskriblio.onrender.com/
+
+Remake of the web game Skribbl.io using Socket.io for simultaneous two-way communication and Express.JS for backend
+
+![Image ingame](./notskriblio_apple.png)
+
+## How It's Made: 
+
+**Tech used:** Node.JS, Express.JS, Socket.IO, TypeScript
+
+
+
+## Optimizations/Other
+
+
 
 Plans for changes:
 - Make something show up when the game ends
