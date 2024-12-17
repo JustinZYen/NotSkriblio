@@ -96,7 +96,10 @@ class Room {
     nextUser() {
         const nextUser = this.users.nextUser(this.#activeUser);
         if (nextUser == undefined) {
-            this.setActiveUser(this.users.getFirstUser().id);
+            const firstUser = this.users.getFirstUser();
+            if (firstUser != undefined) {
+                this.setActiveUser(this.users.getFirstUser().id);
+            }
         }
         else {
             this.setActiveUser(nextUser.id);
