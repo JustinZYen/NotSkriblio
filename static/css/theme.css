@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
+
+div, p, h1 {
+  font-family: "Rubik", sans-serif;
+}
+
+.homepage button:hover, .create-or-join button:hover, .lobby button:hover {
+  background-color: rgb(199, 199, 199);
+}
+
+:root {
+  --transition-bkrd: rgb(20, 33, 101);
+}

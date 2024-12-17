@@ -26,6 +26,7 @@ Plans for changes:
 - reset room when game ends
 - Add icon to the site
 - Make clicking without dragging on the canvas draw a circle
+- Make it possible to configure settings for created lobbies
 Bugs:
 - Lobbies can be abused by manually changing view of the page to join lobbies repeatedly
 - If the active user leaves the game, the next user becomes the active user but with the now-lowered timer duration

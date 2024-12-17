@@ -1,0 +1,16 @@
+/* create or join (page 2) */
+
+.create-or-join {
+    height: 100vh;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .create-or-join button {
+    border-radius: 1rem;
+    border: solid black;
+    margin-bottom: 10px;
+    height: 3rem;
+    width: 7rem;
+  }

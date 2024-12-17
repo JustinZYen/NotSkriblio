@@ -1,0 +1,204 @@
+.body {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .body .header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: lightgray;
+    height: 75px;
+    width: 100%;
+    font-size: 30px;
+  }
+  
+  .header h1 {
+    font-weight: 300;
+    word-spacing: 20px;
+  }
+  
+  .header #timer {
+    justify-self: start;
+    position: absolute;
+    left: 10px;
+    right: 10px;
+  }
+
+  #body-content {
+    display: flex;
+    justify-content: center;
+    height: 500px;
+  }
+  
+  #users {
+    border: solid 2px black;
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    height: 500px;
+    overflow-y: auto;
+  }
+  
+  #users .me {
+    font-weight:bold;
+  }
+  
+  #my-canvas{
+    border: solid 2px black;
+    margin-left: -2px;
+  }
+  
+  #drawing-options {
+    border: solid 2px black;
+    display: flex;
+    align-items: center;
+    flex: 0 0 125px;
+    flex-direction: column;
+    margin-left: -2px;
+  }
+  
+  #adjust {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    width: 75px;
+    font-size: 13px;
+  }
+  
+  #line-width-slider {
+    width: 75px;
+  }
+  
+  .color-container {
+    border-top: solid 2px black;
+    display: grid;
+    max-width: 125px;
+    grid-template: 1fr;
+    padding: 10px;
+    height: 400px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+  
+  .color-container button {
+    height: 50px;
+    width: 50px;
+    margin: 20px;
+  }
+  
+  .color-container .selected {
+    border-width:5px;
+  }
+  
+  .color-container :not(.selected):hover {
+    border-width:3px;
+  }
+  
+  #drawing-type {
+    height:50px;
+  }
+  
+  #form {
+    border: solid 2px black;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 300px;
+    width: 300px;
+    font-size: 16px;
+    margin-left: -2px;
+    overflow-wrap: break-word;
+  }
+  
+  #log {
+    background-color: rgb(228, 225, 225);
+    font-size: 1.5ch;
+    padding: 2ch 1.2ch 0.5ch 1.2ch;
+    height: 450px;
+    overflow-y:scroll;
+  }
+  
+  form input {
+    height: 50px;
+    padding: 1ch 1ch 1ch 1ch;
+    font-size: 1rem;
+  }
+  
+  form input:focus {
+    outline: none;
+  }
+  
+  form p {
+    border-left: solid 0.2rem rgb(91, 88, 88);
+    padding-left: 0.5rem;
+    margin-bottom: 1.1ch;
+  }
+  
+  form p:nth-child(odd) {
+    background-color: rgb(209, 208, 208);
+  }
+  
+  .user {
+    display: flex;
+    border-bottom: solid 2px black;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+    gap: 10px;
+    font-size: 1rem;
+    max-width: 100%;
+  }
+  
+  .user .nickname {
+    max-width: 70px;
+    word-wrap: break-word;
+  }
+  
+  .user canvas {
+    border: solid 2px black;
+    border-radius: 2px;
+    background-color: rgb(228, 228, 228);
+  }
+  
+  /* New round screen */
+  #round-placeholder {
+    display: flex;
+    flex-direction: column;
+    position:absolute;
+    pointer-events:none;
+    top:0;
+    left:0;
+    background-color:var(--transition-bkrd);
+    height:100%;
+    width:100%;
+  }
+  
+  #round-placeholder header {
+    width: 100%;
+    background-color: white;
+    padding: 1.5rem;
+    color: black;
+    display: flex;
+    justify-content: center;
+    font-size: 3ch;
+  }
+  
+  #round-placeholder body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "current-winner score";
+  }
+  
+  #round-placeholder .current-winner {
+    grid-column: current-winner;
+    border: solid red;
+  }
+  
+  #round-placeholder .user-list {
+    grid-column: score;
+    border: solid green;
+  }
+  
