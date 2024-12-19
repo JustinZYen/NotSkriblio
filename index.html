@@ -24,18 +24,32 @@
 </head>
 
 <body>
-  <div class="homepage" style="display: flex">
-     <div class="center-container">
+  <div class="home page" style="display: flex">
+    <h1>NotSkribbl.io</h1>
+    <div class="center-container">
+      <div class="tab-bar">
+        <div class="current-tab">Menu</div>
+        <div class="icons">
+          <img src="images/minus.svg" class="tab-decoration" alt="minimize button">
+          <img src="images/square-outline.svg" class="tab-decoration" alt="expand button">
+          <img src="images/window-close.svg" class="tab-decoration" alt="close window button">
+        </div>
+      </div>
       <figure>
+        <div class="description">
+          <h3>Draw me!</h3>
+          <img src="images/arrow-left-bottom.svg" class="description-decoration" alt="arrow">
+        </div>
         <canvas id="home-canvas"></canvas>
         <button id="canvas-reset">reset</button>
       </figure>
+      <h3>My name is...</h3>
       <input type="text" id="set-username" autocomplete="off" placeholder="Enter your username" maxlength="25">
-      <button class="start">Start</button>
-     </div>
+      <button class="start">Start!</button>
+    </div>
   </div>
 
-  <div class="create-or-join" style="display: none">
+  <div class="create-or-join page" style="display: none">
     <button class="back-button">Back</button>
     <div class="center-container">
       <button class="create-lobby">Create a New Lobby</button>
@@ -43,7 +57,7 @@
     </div>
   </div>
 
-  <div id="lobby" style="display: none">
+  <div id="lobby" class="page" style="display: none">
     <button class="back-button">Back</button>
     <h1 class="lobby-header">Current Lobbies</h1>
     <div class="bottom">
@@ -54,7 +68,7 @@
     </div>
   </div>
 
-  <div id="lobby-creator" style="display: none">
+  <div id="lobby-creator" class="page" style="display: none">
     <button class="back-button">Back</button>
     <div class="center-container">
       <input type="text" id="lobby-name" autocomplete="off" placeholder="lobby name">
@@ -62,7 +76,7 @@
     </div>
   </div>
 
-  <div class="body" style="display: none">
+  <div class="body page" style="display: none">
     <div class="header">
       <div id="timer">🕒</div>
       <h1 id="word-bar">word to guess goes here</h1>

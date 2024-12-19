@@ -1,12 +1,12 @@
 "use strict";
 
-import {lobbyCreator,lobby,createOrJoinMenu,homepage} from "./global.js"
+import {lobbyCreator,lobby,createOrJoinMenu,home} from "./global.js"
 
 // Listen for back button being clicked
 const backButton = createOrJoinMenu.querySelector(".back-button")!;
 backButton.addEventListener("click", ()=>{
     createOrJoinMenu.style.display = "none";
-    homepage.style.display = "flex";
+    home.style.display = "flex";
 })
 
 // Listen for choice to create a new lobby

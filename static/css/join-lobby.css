@@ -3,30 +3,30 @@
 .lobby-header {
     font-size: 40px;
     padding-bottom: 1rem;
-  }
-  
-  img {
+}
+
+img {
     height: 240px;
     width: auto;
-  }
-  
-  #lobby {
+}
+
+#lobby {
     height: 100vh;
     width: 100vw;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-  }
-  
-  .bottom {
+}
+
+.bottom {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 3rem;
     min-width: 700px;
-  }
-  
-  #lobby .lobby-container {
+}
+
+#lobby .lobby-container {
     width: 40%;
     min-height: 250px;
     min-width: 400px;
@@ -34,9 +34,9 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-  }
-  
-  ul {
+}
+
+ul {
     border: solid black;
     padding: 0.5rem;
     width: 95%;
@@ -44,16 +44,16 @@
     min-width: 350px;
     height: 240px;
     overflow-y: scroll;
-  }
-  
-  li {
+}
+
+li {
     border: solid 3px black;
     border-radius: 3px;
     margin-bottom: 0.2rem;
     list-style-type: none;
     justify-content: space-between;
-  }
-  
-  .create {
+}
+
+.create {
     margin-bottom: 1rem;
-  }
+}

@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
     io.to(roomName).emit('chat message', userData.username + ' joined the room');
 
     // Add current user into users list
-    currentRoom.addUser(socket.id, userData);
+    currentRoom.addUser(userData);
 
     // Tell new user which user id they are
     io.to(socket.id).emit("you are",socket.id);

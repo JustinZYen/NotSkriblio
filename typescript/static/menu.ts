@@ -1,5 +1,5 @@
 "use strict";
-import {socket, homepage, createOrJoinMenu} from "./global.js";
+import {socket, home, createOrJoinMenu} from "./global.js";
 
 const profileCanvas = <HTMLCanvasElement>document.getElementById("home-canvas")!; // Tell typescript that the element is definitely not null
 const homeInput = <HTMLInputElement>document.getElementById("set-username")!;
@@ -47,7 +47,7 @@ resetButton.addEventListener("click", () => {
 const startButton = document.querySelector(".start")!;
 startButton.addEventListener('click', () => {
     createOrJoinMenu.style.display = "flex";
-    homepage.style.display = "none";
+    home.style.display = "none";
     socket.emit("set username", homeInput.value);
     socket.emit("set profile picture", { "width": profileCanvas.width, "height": profileCanvas.height, "drawActions": drawActions });
 });
