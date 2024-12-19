@@ -1,109 +1,110 @@
 import fs from 'fs';
 import { Server } from 'socket.io';
 
-let wordArr:string[] = [];
+let wordArr: string[] = [];
 fs.readFile('static/words.txt', (err, data) => {
-  if (err) throw err;
-  wordArr = data.toString().split(/[\r\n]+/);
-  //console.log(data.toString().split(/[\r\n]+/));
+    if (err) throw err;
+    wordArr = data.toString().split(/[\r\n]+/);
+    //console.log(data.toString().split(/[\r\n]+/));
 });
-type UserData = {id:string,
-    username:string,
-    profilePicture:{
-        width:number,
-        height:number,
-        drawActions:{
-            action:string,
-            params:{
+type UserData = {
+    id: string,
+    username: string,
+    profilePicture: {
+        width: number,
+        height: number,
+        drawActions: {
+            action: string,
+            params: {
                 x: number,
-                y:number,
-            }}[]}
-    score:number};
+                y: number,
+            }
+        }[]
+    }
+    score: number
+};
 
 enum GameState {
-    GAME_NOT_STARTED,
-    GAME_IN_PROGRESS,
-    WAITING_NEXT_GAME
+    GAME_NOT_STARTED = "Game not started",
+    TURN_IN_PROGRESS = "Turn in progress",
+    TURN_TRANSITION = "Transitioning between turns",
+    INTERRUPTED_TURN = "Player's turn was interrupted", //Likely due to them leaving the game
+    ROUND_TRANSITION = "Transitioning between rounds",
+    WAITING_NEXT_GAME = "Waiting for next game"
 }
 class Room {
-    static MAX_TIME_S = 10;
-    static MAX_ROUNDS = 3;
-    static MIN_PLAYERS = 1; // Need 3 players to start the game
-    static BETWEEN_ROUNDS_MS = 5000;
-    #currentRound = 0;
-    #activeUser:string|null = null;
+    static readonly MAX_TIME_S = 10;
+    static readonly MAX_ROUNDS = 3;
+    static readonly MIN_PLAYERS = 2; // Need 2 players to start the game
+    static readonly BETWEEN_ROUNDS_MS = 5000;
+    static readonly BETWEEN_GAMES_MS = 5000;
+    private currentRound = 0;
+    private activeUser: string | undefined = undefined;
+    private nextActiveUser: string | undefined = undefined;
     activeWord = "";
-   // users = new Map<string,UserData>(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
+    // users = new Map<string,UserData>(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
     users = new ComboMapList();
-    canvasEvents:{action:string,params?:{x:number,y:number}}[] = [];
-    timer:NodeJS.Timeout;
+    canvasEvents: { action: string, params?: { x: number, y: number } }[] = [];
     time = Room.MAX_TIME_S;
     roomName;
+    private roundTimer: NodeJS.Timeout;
     gameStatus = GameState.GAME_NOT_STARTED;
     io; // socketio Server object
-    constructor(roomName:string, io:Server) {
+    constructor(roomName: string, io: Server) {
         this.roomName = roomName;
         this.io = io;
-        /*
-        setInterval(()=>{
-          if (this.time == 0) {
-            this.time = Room.MAX_TIME_S
-    ;
-            this.nextUser();      
-          }
-          this.io.to(this.roomName).emit("timer change",this.time);
-          this.time--;
-        },1000)
-        */
     }
 
-    addUser(userId:string, userData:UserData) {
+    /**
+     * Adds the specified user to the users list, attempting to start the game
+     * @param userData 
+     */
+    addUser(userData: UserData) {
         userData.score = 0; // Add score field once user has joined a game
         console.log("user data being emitted is: " + Object.keys(userData.profilePicture));
         this.io.to(this.roomName).emit("new user", userData);
         //console.log(username);
         this.users.addUser(userData);
-        if (this.#activeUser == null) {
-            this.setActiveUser(userId);
+        if (this.gameStatus == GameState.GAME_NOT_STARTED) {
+            this.nextState(); // Attempts to start the game
         }
-        if ((this.gameStatus == GameState.GAME_NOT_STARTED) && this.users.size() >= Room.MIN_PLAYERS) {
-            this.startGame();
-        }
-        // Check if there are now enough users to start the game
     }
 
-    removeUser(userId:string) {
+    /**
+     * Removes the specified user from the users list, force ending the current round if the active player was the removed user
+     * @param userId 
+     */
+    removeUser(userId: string) {
+        if (userId == this.activeUser) {
+            clearInterval(this.roundTimer); // Clear the timer that would normally end the turn
+            if (this.users.size() == 0) {
+                this.nextActiveUser = undefined;
+            } else {
+                this.nextActiveUser = this.getNextUser();
+            }
+        }
         this.users.removeUser(userId);
         this.io.to(this.roomName).emit("remove user", userId);
-        if (userId == this.#activeUser) {
-            // Choose a new user
-            if (this.users.size() == 0) {
-                this.#activeUser = null;
-            } else {
-                this.#activeUser = this.users.getFirstUser()!.id;
-            }
+        if (userId == this.activeUser) {
+            this.setActiveUser(undefined);
+            this.gameStatus = GameState.INTERRUPTED_TURN;
+            this.nextState();
         }
     }
 
     getActiveUser() {
-        return this.#activeUser;
+        return this.activeUser;
     }
 
-    setActiveUser(userId:string) {
-        const getWord = ():string => {
-            let val = Math.floor(Math.random() * wordArr.length);
-            return wordArr[val]!; // Exclamation mark tells typescript that there is definitely a value
+    private setActiveUser(userId: string | undefined) {
+        console.log("setting active user to " + userId);
+        if (userId == undefined) {
+            this.io.to(this.roomName).emit("new active user", { prevUserId: this.activeUser, newUserId: undefined });
+        } else {
+            // this.activeUser should be undefined here
+            this.io.to(this.roomName).emit("new active user", { prevUserId: this.activeUser, newUserId: userId });
         }
-        const previousUser = this.#activeUser;
-        this.#activeUser = userId;
-        console.log("user id " + userId + " is the active user");
-        this.io.to(userId).emit("chat message", "You are the active user!");
-        this.io.to(userId).emit("drawing information request"); // Get line width and line color
-        this.activeWord = getWord(); // Choose a new word for the active user
-        this.io.to(userId).emit("chat message", "Your word is: " + this.activeWord);
-        this.io.to(this.roomName).emit("new active user", {prevUser:previousUser,newUser:this.#activeUser});
-        this.io.to(this.roomName).emit("new word", this.activeWord.length);
-        this.clearCanvas();
+        this.activeUser = userId;
     }
 
     clearCanvas() {
@@ -111,143 +112,196 @@ class Room {
         this.canvasEvents = [{ "action": "clear canvas" }];
     }
 
-    nextUser() {
-        const nextUser = this.users.nextUser(this.#activeUser!);
-        if (nextUser == undefined) {
-            const firstUser = this.users.getFirstUser();
-            if (firstUser != undefined) {
-                this.setActiveUser(this.users.getFirstUser()!.id);
-            }
+    /**
+     * Returns the next user in line
+     * 
+     * Returns undefined if the  current user is last in line
+     */
+    getNextUser() {
+        if (this.activeUser == undefined) {
+            throw "Trying to get next user but active user is undefined";
         } else {
-            this.setActiveUser(nextUser.id);
-        }
-    }
-
-    runTimer() {
-        this.timer = setInterval(() => {
-            this.io.to(this.roomName).emit("timer change", this.time);
-            if (this.time == 0) {
-                this.time = Room.MAX_TIME_S;
-                const sortedUsers = this.sortScores();
-                for (const user of sortedUsers) {
-                    this.io.to(this.roomName).emit("display scores", {userData: user, BETWEEN_ROUNDS_MS:Room.BETWEEN_ROUNDS_MS});
-                };
-                this.resetTimer();
-
-                // INCOMPLETE -----------------------
-                // sort user scores
-                
-            }
-            this.time--;
-        }, 1000);
-    }
-
-    resetTimer() {
-        clearTimeout(this.timer);
-        setTimeout(() => {
-            this.runTimer();
-            this.nextUser();
-        }, Room.BETWEEN_ROUNDS_MS);
-    }
-
-    startGame() {
-        console.log("Game started!");
-        //this.nextState();
-        
-        this.gameStatus = GameState.GAME_IN_PROGRESS;
-        this.nextRound();
-        this.runTimer();
-        
-    }
-
-    /*
-    nextState() {
-        if (this.gameStatus == GameState.GAME_NOT_STARTED) {
-            this.gameStatus == GameState.GAME_IN_PROGRESS;
-            this.nextState();
-        } else if (this.gameStatus == GameState.GAME_IN_PROGRESS) {
-            if (this.isLastUser()) {
-                this.nextRound();
-                this.nextState();
+            const nextUser = this.users.nextUser(this.activeUser);
+            if (nextUser == undefined) {
+                return undefined;
             } else {
-                this.nextUser();
+                return nextUser.id;
             }
-        } else if (this.gameStatus == GameState.WAITING_NEXT_GAME) {
-            // something
-        } else {
-            throw new Error("Game status "+this.gameStatus+" is not defined");
         }
     }
-    */
+    /**
+     * Attempts to go to the next state in the game if requirements are met
+     */
+    nextState() {
+        console.log("Game state: " + this.gameStatus)
+        switch (this.gameStatus) {
+            case GameState.GAME_NOT_STARTED:
+                if (this.users.size() >= Room.MIN_PLAYERS) { // Check if player requirement is met
+                    this.gameStatus = GameState.TURN_IN_PROGRESS;
+                    this.startGame();
+                    this.nextState();
+                }
+                break;
+            case GameState.TURN_IN_PROGRESS:
+                this.initializeTurn();
+                this.roundTimer = setInterval(() => {
+                    this.io.to(this.roomName).emit("timer change", this.time);
+                    if (this.time <= 0) {
+                        this.gameStatus = GameState.TURN_TRANSITION;
+                        clearInterval(this.roundTimer);
+                        this.nextState();
+                    }
+                    this.time--;
+                }, 1000);
+                break;
+            case GameState.TURN_TRANSITION:
+                if (!this.isLastUser()) {
+                    this.nextActiveUser = this.getNextUser()!;
+                    this.setActiveUser(undefined);
+                    this.gameStatus = GameState.TURN_IN_PROGRESS;
+                    this.nextState();
+                } else {
+                    this.gameStatus = GameState.ROUND_TRANSITION;
+                    this.nextState();
+                }
+                break;
+            case GameState.INTERRUPTED_TURN: // removeUser automatically sets up next active user and clears current active user
+                if (this.nextActiveUser == undefined) {
+                    this.gameStatus = GameState.ROUND_TRANSITION;
+                } else {
+                    this.gameStatus = GameState.TURN_IN_PROGRESS;
+                }
+                this.nextState();
+                break;
+            case GameState.ROUND_TRANSITION:
+                if (this.currentRound < Room.MAX_ROUNDS) {
+                    this.nextRound();
+                    setTimeout(() => {
+                        this.gameStatus = GameState.TURN_IN_PROGRESS;
+                        this.nextState();
+                    }, Room.BETWEEN_ROUNDS_MS);
+                } else {
+                    this.endGame();
+                    this.gameStatus = GameState.WAITING_NEXT_GAME;
+                    setTimeout(() => {
+                        this.gameStatus = GameState.GAME_NOT_STARTED;
+                        this.nextState();
+                    }, Room.BETWEEN_GAMES_MS);
+                }
+                break;
+            case GameState.WAITING_NEXT_GAME:
+                // Nothing happens here; it is just waiting until the timeout finishes and moves back to the GAME_NOT_STARTED state
+                break;
+            default:
+                throw new Error("Game status " + this.gameStatus + " is not defined");
+        }
+    }
+
+    /**
+     * Starts the game, initializing appropriate values
+     */
+    private startGame() {
+        this.currentRound = 1;
+        this.setActiveUser(undefined);
+        this.nextActiveUser = this.users.getFirstUser()!.id;
+    }
+
+    /**
+     * Sets new user, resets timer, etc
+     */
+    private initializeTurn() {
+        const getWord = (): string => {
+            let val = Math.floor(Math.random() * wordArr.length);
+            return wordArr[val]!; // Exclamation mark tells typescript that there is definitely a value
+        }
+        if (this.nextActiveUser == undefined) {
+            console.log("No more users in game, ending game");
+            this.gameStatus = GameState.GAME_NOT_STARTED;
+        } else {
+            this.setActiveUser(this.nextActiveUser);
+            this.nextActiveUser = undefined;
+            this.time = Room.MAX_TIME_S;
+            const activeUser = this.activeUser!;
+            console.log("user id " + activeUser + " is the active user");
+            this.io.to(activeUser).emit("chat message", "You are the active user!");
+            this.io.to(activeUser).emit("drawing information request"); // Get line width and line color
+            this.activeWord = getWord(); // Choose a new word for the active user
+            this.io.to(activeUser).emit("chat message", "Your word is: " + this.activeWord);
+            this.io.to(this.roomName).emit("new word", this.activeWord.length);
+        }
+    }
+
     /**
      * Check if the current user is the last one
      */
-    isLastUser() {
-
+    private isLastUser() {
+        return this.users.nextUser(this.activeUser!) == undefined;
     }
 
     /**
-     * Advances the game to the next round and sets the active user to undefined
+     * Advances the game to the next round, changing active user back to the first user
      */
-    nextRound() {
-        this.#currentRound++;
-        if (this.#currentRound > Room.MAX_ROUNDS) {
-            this.endGame();
-        }
+    private nextRound() {
+        this.setActiveUser(undefined);
+        this.nextActiveUser = this.users.getFirstUser()!.id;
+        this.currentRound++;
+        const sortedUsers = this.sortScores();
+        for (const user of sortedUsers) {
+            this.io.to(this.roomName).emit("display scores", { userData: user, BETWEEN_ROUNDS_MS: Room.BETWEEN_ROUNDS_MS });
+        };
     }
 
+    /**
+     * Performs game-end procedures
+     */
     endGame() {
         console.log("Game over!");
         // Emit message to all users containing game-end data
         // Reset round
-        this.#currentRound = 0;
+        this.currentRound = 0;
         // Ensure that the next player to become active user is the first user
 
         // Reset scores
-        for (const [_,currentUser] of this.users.users) {
+        for (const [_, currentUser] of this.users.users) {
             const userData = currentUser.userData;
             userData.score = 0;
             this.io.to(this.roomName).emit("score change", { "userId": userData.id, "score": userData.score });
         }
-        // Wait for a bit, then start a new game
-        setTimeout(()=> {
-            this.startGame();
-        },10000);
     }
 
-    wordGuessed(userId:string) {
-        if (this.gameStatus = GameState.GAME_IN_PROGRESS) {
+    wordGuessed(userId: string) {
+        if (this.gameStatus = GameState.TURN_IN_PROGRESS) {
             // Player who guessed the word gets points
             // Pass active player to the next person
             console.log('time guessed: ' + this.time);
             this.addScore(userId);
             // this.nextUser();
             // this.time = Room.MAX_TIME_S
-    ;
+            ;
         }
     }
-    
+
     /*
     Gain 500 points for guessing instantly and -5 points for every extra second it takes to guess
     Drawer gains a quarter of the number of points the guesser gained
     */
-    addScore(userId:string) {
+    addScore(userId: string) {
         let points = 500 - (Room.MAX_TIME_S - this.time) * 5;
 
         this.users.getUser(userId)!.score += points;
-        this.users.getUser(this.#activeUser!)!.score += Math.floor(points / 4);
+        this.users.getUser(this.activeUser!)!.score += Math.floor(points / 4);
 
         this.io.to(this.roomName).emit("score change", { "userId": userId, "score": this.users.getUser(userId)!.score });
-        this.io.to(this.roomName).emit("score change", { "userId": this.#activeUser, "score": this.users.getUser(this.#activeUser!)!.score });
+        this.io.to(this.roomName).emit("score change", { "userId": this.activeUser, "score": this.users.getUser(this.activeUser!)!.score });
     }
 
     sortScores() {
         // store the list of users as an array instead of a map
         const userList: UserData[] = [];
-        for (const [_,currentUser] of this.users.users) {
+        for (const [_, currentUser] of this.users.users) {
             userList.push(currentUser.userData);
         }
-        console.log(userList);
+        //console.log(userList);
         for (let i = 0; i < userList.length; i++) {
             let indexOfMax = i;
             for (let j = i + 1; j < userList.length; j++) {
@@ -255,7 +309,7 @@ class Room {
                     indexOfMax = j;
                 }
             }
-            
+
             [userList[i], userList[indexOfMax]!] = [userList[indexOfMax]!, userList[i]!];
         }
 
@@ -263,11 +317,14 @@ class Room {
     }
 }
 
+/**
+ * Stores all the users in a data structure to enable quick lookups while also being able to advance to next user quickly
+ */
 class ComboMapList {
     users = new Map<string, UserNode>();
-    #head:UserNode|null = null;
-    #tail:UserNode|null = null;
-    addUser(userData:UserData) {
+    #head: UserNode | null = null;
+    #tail: UserNode | null = null;
+    addUser(userData: UserData) {
         const newUser = new UserNode(userData);
         if (this.#tail == null) {
             this.#head = newUser;
@@ -275,11 +332,11 @@ class ComboMapList {
             this.#tail.next = newUser;
             newUser.previous = this.#tail;
         }
-        this.users.set(userData.id,newUser);
+        this.users.set(userData.id, newUser);
         this.#tail = newUser;
     }
 
-    removeUser(userId:string) {
+    removeUser(userId: string) {
         const userToRemove = this.users.get(userId);
         if (userToRemove == undefined) {
             console.log(`user id ${userId} does not exist in the users list`);
@@ -300,11 +357,16 @@ class ComboMapList {
         this.users.delete(userId);
     }
 
-    getUser(userId:string) {
+    getUser(userId: string) {
         return this.users.get(userId)?.userData;
     }
 
-    nextUser(userId:string) {
+    /**
+     * Returns the next user in line if the specified user is not last
+     * @param userId 
+     * @returns 
+     */
+    nextUser(userId: string) {
         return this.users.get(userId)?.next?.userData;
     }
 
@@ -318,10 +380,10 @@ class ComboMapList {
 }
 
 class UserNode {
-    previous:UserNode|null = null;
-    next:UserNode|null = null;
-    userData:UserData;
-    constructor (userData:UserData) {
+    previous: UserNode | null = null;
+    next: UserNode | null = null;
+    userData: UserData;
+    constructor(userData: UserData) {
         this.userData = userData
     }
 }

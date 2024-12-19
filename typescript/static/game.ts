@@ -308,16 +308,19 @@ socket.on("remove user", (userId:string) => {
     }
 })
 
-socket.on("new active user", (userInfo:{prevUser:string,newUser:string}) => {
-    if (userInfo.hasOwnProperty("prevUser")) {
-        const prevUser = userInfo.prevUser;
-        if (prevUser != null) {
-            document.getElementById(prevUser)!.style.backgroundColor = "white";
+socket.on("new active user", (userInfo:{prevUserId:string|undefined,newUserId:string|undefined}) => {
+    console.log(`prevUserId: ${userInfo.prevUserId}, newUserId: ${userInfo.newUserId}`);
+    if (userInfo.prevUserId != undefined) {
+        const prevUserElement = document.getElementById(userInfo.prevUserId);
+        if (prevUserElement != null) {
+            prevUserElement.style.backgroundColor = "white";
         }
     }
-    const newUser = userInfo.newUser;
-    if (newUser != null) {
-        document.getElementById(newUser)!.style.backgroundColor = "yellow";
+    if (userInfo.newUserId != undefined) {
+        const newUserElement = document.getElementById(userInfo.newUserId);
+        if (newUserElement != null) {
+            newUserElement.style.backgroundColor = "yellow";
+        }
     }
 });
 
