@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
             io.to(socket.id).emit(canvasEvent.action, canvasEvent.params);
         }
         // Highlight the active user
-        io.to(socket.id).emit("new active user", { newUser: currentRoom.getActiveUser() });
+        io.to(socket.id).emit("new active user", { prevUserId: undefined, newUserId: currentRoom.getActiveUser() });
         // Send a message to everyone that a new user has joined
         io.to(roomName).emit('chat message', userData.username + ' joined the room');
         // Add current user into users list
