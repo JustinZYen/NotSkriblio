@@ -229,10 +229,7 @@ class Room {
         this.nextActiveUser = this.users.getFirstUser().id;
         this.currentRound++;
         const sortedUsers = this.sortScores();
-        for (const user of sortedUsers) {
-            this.io.to(this.roomName).emit("display scores", { userData: user, BETWEEN_ROUNDS_MS: Room.BETWEEN_ROUNDS_MS });
-        }
-        ;
+        this.io.to(this.roomName).emit("display scores", { usersData: sortedUsers, BETWEEN_ROUNDS_MS: Room.BETWEEN_ROUNDS_MS });
     }
     /**
      * Performs game-end procedures
@@ -240,9 +237,10 @@ class Room {
     endGame() {
         console.log("Game over!");
         // Emit message to all users containing game-end data
+        const userScores = this.sortScores();
+        this.io.to(this.roomName).emit("display game end", userScores);
         // Reset round
         this.currentRound = 0;
-        // Ensure that the next player to become active user is the first user
         // Reset scores
         for (const [_, currentUser] of this.users.users) {
             const userData = currentUser.userData;

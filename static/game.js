@@ -301,15 +301,25 @@ socket.on("score change", (scoreData) => {
     (document.getElementById(scoreData.userId)?.querySelector(".score")).textContent = "Score: " + scoreData.score;
 });
 socket.on('display scores', (lobbyData) => {
-    let tempUser = document.createElement('div');
-    tempUser.classList.add('tempUser');
-    tempUser.textContent = lobbyData.userData.username;
     const userList = document.querySelector('.user-list');
-    userList.appendChild(tempUser);
+    for (const userData of lobbyData.usersData) {
+        const tempUser = document.createElement('div');
+        tempUser.classList.add('tempUser');
+        const userName = document.createElement("div");
+        userName.textContent = userData.username;
+        tempUser.appendChild(userName);
+        const userScore = document.createElement("div");
+        userScore.textContent = userData.score.toString();
+        tempUser.appendChild(userScore);
+        userList.appendChild(tempUser);
+    }
     const roundPlaceholder = document.getElementById("round-placeholder");
     roundPlaceholder.style.display = "flex";
     setTimeout(() => {
         userList.replaceChildren();
         roundPlaceholder.style.display = "none";
     }, lobbyData.BETWEEN_ROUNDS_MS);
+});
+socket.on("display game end", (userScores) => {
+    console.log(userScores);
 });
