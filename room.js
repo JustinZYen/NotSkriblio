@@ -136,6 +136,7 @@ class Room {
                 }, 1000);
                 break;
             case GameState.TURN_TRANSITION:
+                this.clearCanvas();
                 if (!this.isLastUser()) {
                     this.nextActiveUser = this.getNextUser();
                     this.setActiveUser(undefined);
@@ -148,6 +149,7 @@ class Room {
                 }
                 break;
             case GameState.INTERRUPTED_TURN: // removeUser automatically sets up next active user and clears current active user
+                this.clearCanvas();
                 if (this.nextActiveUser == undefined) {
                     this.gameStatus = GameState.ROUND_TRANSITION;
                 }
