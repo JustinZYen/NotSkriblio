@@ -44,6 +44,10 @@
   font-weight: bold;
 }
 
+#users .active-user {
+  background-color:yellow;
+}
+
 #my-canvas {
   border: solid 2px black;
   margin-left: -2px;

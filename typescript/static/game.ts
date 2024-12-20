@@ -313,13 +313,13 @@ socket.on("new active user", (userInfo:{prevUserId:string|undefined,newUserId:st
     if (userInfo.prevUserId != undefined) {
         const prevUserElement = document.getElementById(userInfo.prevUserId);
         if (prevUserElement != null) {
-            prevUserElement.style.backgroundColor = "white";
+            prevUserElement.classList.remove("active-user");
         }
     }
     if (userInfo.newUserId != undefined) {
         const newUserElement = document.getElementById(userInfo.newUserId);
         if (newUserElement != null) {
-            newUserElement.style.backgroundColor = "yellow";
+            newUserElement.classList.add("active-user");
         }
     }
 });
