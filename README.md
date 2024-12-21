@@ -18,16 +18,13 @@ NotSkribblio is built using Node.js with a backend powered by Express.js, while 
 ## Optimizations/Other
 
 Plans for changes:
+- Make round-end screen also display scores
 - Make something show up when the game ends
    - Display final rankings
    - Players stay in the game, but their scores are reset
 - undo/redo buttons (hard to implement)
-- Make score show only when the current round ends
-- reset room when game ends
 - Add icon to the site
 - Make clicking without dragging on the canvas draw a circle
 - Make it possible to configure settings for created lobbies
 Bugs:
 - Lobbies can be abused by manually changing view of the page to join lobbies repeatedly
-- If the active user leaves the game, the next user becomes the active user but with the now-lowered timer duration
-- If game runs for too long, timer counts down far too quickly

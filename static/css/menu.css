@@ -17,7 +17,7 @@
     background-color: white;
     border-radius: 20px;
     width: 700px;
-    height: 450px;
+    height: 550px;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -89,6 +89,7 @@ figure {
     font-size: 15px;
     padding: 0.2rem 0.8rem;
     border-radius: 0.5rem;
+    border: solid 4px var(--black);
     padding: 0.2rem;
     height: 2rem;
     width: 10rem;
