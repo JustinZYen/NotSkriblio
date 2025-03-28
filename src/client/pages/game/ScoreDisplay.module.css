@@ -1,0 +1,39 @@
+/* New round screen */
+.round-placeholder {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    background-color: var(--transition-bkrd);
+    height: 100%;
+    width: 100%;
+}
+
+.round-placeholder header {
+    width: 100%;
+    background-color: white;
+    padding: 1.5rem;
+    color: black;
+    display: flex;
+    justify-content: center;
+    font-size: 3ch;
+}
+
+.round-placeholder body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "current-winner score";
+}
+
+.round-placeholder .current-winner {
+    grid-column: current-winner;
+    border: solid red;
+}
+
+.round-placeholder .user-list {
+    grid-column: score;
+    border: solid green;
+}

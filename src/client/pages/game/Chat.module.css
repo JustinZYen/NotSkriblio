@@ -1,0 +1,39 @@
+.form {
+    border: solid 2px black;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 300px;
+    width: 300px;
+    font-size: 16px;
+    margin-left: -2px;
+    overflow-wrap: break-word;
+}
+
+.log {
+    background-color: rgb(228, 225, 225);
+    font-size: 1.5ch;
+    padding: 2ch 1.2ch 0.5ch 1.2ch;
+    height: 90%;
+    overflow-y: scroll;
+}
+
+.form input {
+    height: 10%;
+    padding: 1ch 1ch 1ch 1ch;
+    font-size: 1rem;
+}
+
+.form input:focus {
+    outline: none;
+}
+
+.log li {
+    border-left: solid 0.2rem rgb(91, 88, 88);
+    padding-left: 0.5rem;
+    margin-bottom: 1.1ch;
+    list-style-type: none;
+}
+
+.log li:nth-child(odd) {
+    background-color: rgb(209, 208, 208);
+}

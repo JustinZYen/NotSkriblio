@@ -1,0 +1,28 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+
+.body-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 500px;
+    width: 100%;
+    overflow: scroll
+}
+
+.body-content>*:first-child {
+    flex: 1
+}
+
+.body-content>*:not(:first-child):not(:last-child) {
+    flex: 2
+}
+
+.body-content>*:last-child {
+    flex: 1
+}

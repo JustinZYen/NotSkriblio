@@ -1,0 +1,29 @@
+.users {
+    border: solid 2px black;
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    overflow-y: auto;
+}
+
+.user {
+    display: flex;
+    border-bottom: solid 2px black;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+    gap: 10px;
+    font-size: 1rem;
+    max-width: 100%;
+}
+
+.user .nickname {
+    max-width: 70px;
+    word-wrap: break-word;
+}
+
+.user canvas {
+    border: solid 2px black;
+    border-radius: 2px;
+    background-color: rgb(228, 228, 228);
+}

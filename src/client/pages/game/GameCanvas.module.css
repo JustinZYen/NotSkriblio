@@ -1,0 +1,61 @@
+.game-canvas {
+  display: flex;
+}
+
+.my-canvas {
+  border: solid 2px black;
+  margin-left: -2px;
+  flex: 1
+}
+
+.drawing-options {
+  border: solid 2px black;
+  display: flex;
+  align-items: center;
+  flex: 0 0 125px;
+  flex-direction: column;
+  margin-left: -2px;
+}
+
+.adjust {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  width: 75px;
+  font-size: 13px;
+}
+
+.line-width-slider {
+  width: 75px;
+}
+
+.color-container {
+  border-top: solid 2px black;
+  display: grid;
+  max-width: 125px;
+  grid-template: 1fr;
+  padding: 10px;
+  height: 400px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.color-container button {
+  height: 50px;
+  width: 50px;
+  margin: 20px;
+}
+
+.color-container .selected {
+  border-width: 5px;
+}
+
+.color-container :not(.selected):hover {
+  border-width: 3px;
+}
+
+.drawing-type {
+  height: 50px;
+}

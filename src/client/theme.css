@@ -1,0 +1,58 @@
+* {
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+  font-family: "Rubik", sans-serif;
+}
+
+h1 {
+  font-weight: 200;
+  font-size: 75px;
+}
+
+h3 {
+  font-weight: 400;
+}
+
+.home button:hover,
+.create-or-join button:hover,
+.lobby button:hover {
+  background-color: rgb(199, 199, 199);
+}
+
+:root {
+  --transition-bkrd: rgb(20, 33, 101);
+  --lavender: rgb(220, 208, 255);
+  --lavender-shadow: rgb(142, 128, 184);
+  --dark-magenta: rgb(163, 44, 163);
+  --black: rgb(59, 59, 59);
+}
+
+
+#root {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  min-width: 320px;
+  width:100vw;
+  min-height: 100vh;
+  background-color: var(--lavender);
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 1rem;
+  border: solid black;
+  margin-bottom: 10px;
+  height: 3rem;
+  width: 7rem;
+}
+
+button:hover {
+  background-color:gainsboro;
+}
