@@ -3,7 +3,7 @@ import ViteExpress from "vite-express";
 import { Server } from "socket.io";
 import { Room } from "./Room.js";
 import { UserData } from "./User.js";
-import { ClientToServerEvents, InterServerEvents, RoomJoinResult, ServerToClientEvents, SocketData } from "./socket_types.js";
+import { ClientToServerEvents, InterServerEvents, RoomCreateResult, RoomJoinResult, ServerToClientEvents, SocketData } from "./socket_types.js";
 
 
 const app = express();
@@ -15,7 +15,7 @@ const server = ViteExpress.listen(app, 3000, () =>
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(server);
 
 const rooms = new Map<string, Room>();
-rooms.set("fblthp", new Room("fblthp", io)); // Create a room for testing purposes
+rooms.set("fblthp", new Room("fblthp", 20, 3, io)); // Create a room for testing purposes
 io.on("connection", (socket) => {
   console.log("User connection");
   const userData: UserData = {
@@ -34,13 +34,17 @@ io.on("connection", (socket) => {
     socket.emit("newRoom", roomName);
   }
 
-  socket.on("createRoom", (roomName, callback) => {
+  socket.on("createRoom", (roomName, turnLength,roundCount,callback) => {
     if (rooms.has(roomName)) {
-      callback(false);
+      callback(RoomCreateResult.DuplicateName);
+    } else if (turnLength < 1 || turnLength > 100) { // Kind of arbitrary upper bound
+      callback(RoomCreateResult.InvalidTurnLength)
+    } else if (roundCount < 1 || roundCount > 20) {
+      callback(RoomCreateResult.InvalidRoundCount);
     } else {
-      rooms.set(roomName, new Room(roomName, io));
+      rooms.set(roomName, new Room(roomName,turnLength,roundCount, io));
       io.emit("newRoom", roomName);
-      callback(true);
+      callback(RoomCreateResult.Success);
     }
   })
 

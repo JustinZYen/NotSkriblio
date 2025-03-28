@@ -22,3 +22,8 @@
     height: 3rem;
     width: 7rem;
 }
+
+.center-container {
+    display:flex;
+    flex-direction: column;
+}

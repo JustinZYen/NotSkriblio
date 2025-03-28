@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { socket } from "../../socket";
+
 import chatCSS from "./Chat.module.css";
 
 type ChatProps = {

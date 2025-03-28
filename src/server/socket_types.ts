@@ -24,7 +24,7 @@ interface ClientToServerEvents {
      * @param callback Takes in argument for whether room creation was successful
      * @returns 
      */
-    createRoom: (roomName: string, callback: (response: boolean) => void) => void;
+    createRoom: (roomName: string, turnLength:number, roundCount:number, callback: (response: RoomCreateResult) => void) => void;
 
     /**
      * Set the username for the current player
@@ -60,6 +60,13 @@ enum RoomJoinResult {
     Success = "success"
 }
 
+enum RoomCreateResult {
+    DuplicateName = "a room with that name already exists",
+    InvalidTurnLength = "invalid turn length",
+    InvalidRoundCount = "invalid round count",
+    Success = "success"
+}
+
 interface InterServerEvents {
 }
 
@@ -67,4 +74,4 @@ interface SocketData {
 }
 
 export type { ServerToClientEvents, ClientToServerEvents, InterServerEvents, SocketData };
-export { RoomJoinResult };
+export { RoomJoinResult,RoomCreateResult };

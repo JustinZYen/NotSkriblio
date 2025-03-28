@@ -23,8 +23,9 @@ enum GameState {
     WAITING_NEXT_GAME = "Waiting for next game"
 }
 class Room {
-    static readonly MAX_TIME_S = 20;
-    static readonly MAX_ROUNDS = 3;
+    /** Turn length,in seconds */
+    private turnLength = 20;
+    private numRounds = 3;
     static readonly MIN_PLAYERS = 2; // Need 2 players to start the game
     static readonly BETWEEN_ROUNDS_MS = 5000;
     static readonly BETWEEN_GAMES_MS = 5000;
@@ -35,13 +36,15 @@ class Room {
     // users = new Map<string,UserData>(); // Maps user ids to {"id":user id, "username":username, "profilePicture":{}, "score":score}
     users = new ComboMapList();
     canvasActions:DrawAction[] = [];
-    time = Room.MAX_TIME_S;
+    private time:number = 0;
     roomName;
     private roundTimer: NodeJS.Timeout|undefined;
     gameStatus = GameState.GAME_NOT_STARTED;
     io; // socketio Server object
-    constructor(roomName: string, io: Server<ClientToServerEvents,ServerToClientEvents,InterServerEvents,SocketData>) {
+    constructor(roomName: string, turnLength:number, roundCount:number, io: Server<ClientToServerEvents,ServerToClientEvents,InterServerEvents,SocketData>) {
         this.roomName = roomName;
+        this.turnLength = turnLength;
+        this.numRounds = roundCount;
         this.io = io;
     }
 
@@ -176,7 +179,7 @@ class Room {
                 this.nextState();
                 break;
             case GameState.ROUND_TRANSITION:
-                if (this.currentRound < Room.MAX_ROUNDS) {
+                if (this.currentRound < this.numRounds) {
                     this.nextRound();
                     setTimeout(() => {
                         this.gameStatus = GameState.TURN_IN_PROGRESS;
@@ -223,7 +226,7 @@ class Room {
         } else {
             this.setActiveUser(this.nextActiveUser);
             this.nextActiveUser = undefined;
-            this.time = Room.MAX_TIME_S;
+            this.time = this.turnLength;
             const activeUser = this.activeUser!;
             console.log("user id " + activeUser + " is the active user");
             this.io.to(activeUser).emit("message", "You are the active user!");
@@ -291,7 +294,7 @@ class Room {
     Drawer gains a quarter of the number of points the guesser gained
     */
     addScore(userId: string) {
-        let points = 500 - (Room.MAX_TIME_S - this.time) * 5;
+        let points = 500 - (this.turnLength - this.time) * 5;
 
         this.users.getUser(userId)!.score += points;
         this.users.getUser(this.activeUser!)!.score += Math.floor(points / 4);
