@@ -4,6 +4,7 @@ import { socket } from "../../socket";
 import { useRef, useState } from "react";
 import createLobbyCSS from "./CreateLobby.module.css";
 import { RoomCreateResult } from "../../../server/socket_types";
+import { BackButton } from "../../helpers/BackButton";
 
 function CreateLobby() {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ function CreateLobby() {
 
     return (
         <div className={createLobbyCSS["lobby-creator"]}>
-            <button className="back-button" onClick={()=>{navigate(PageRoutes.LobbySelect)}}>Back</button>
+            <BackButton>Back</BackButton>
             <div className={createLobbyCSS["center-container"]}>
                 {error && <p>{error}</p>}
                 <input type="text" className={createLobbyCSS["lobby-name"]} autoComplete="off" placeholder="lobby name" ref={inputLobbyName}/>

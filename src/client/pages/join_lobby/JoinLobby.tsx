@@ -3,6 +3,7 @@ import { PageRoutes } from "../../organization/routes";
 import { socket } from "../../socket";
 import { RoomJoinResult } from "../../../server/socket_types";
 import joinLobbyCSS from "./JoinLobby.module.css";
+import { BackButton } from "../../helpers/BackButton";
 
 type LobbyProps = {
     rooms: string[]
@@ -22,7 +23,7 @@ function JoinLobby({ rooms }: LobbyProps) {
 
     return (
         <div className={joinLobbyCSS["lobby"]}>
-            <button className={joinLobbyCSS["back-button"]} onClick={() => { navigate(PageRoutes.LobbySelect) }}>Back</button>
+            <BackButton>Back</BackButton>
             <h1 className={joinLobbyCSS["lobby-header"]}>Current Lobbies</h1>
             <div className={joinLobbyCSS["bottom"]}>
                 <div className={joinLobbyCSS["lobby-container"]}>
