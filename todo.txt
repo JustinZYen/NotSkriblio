@@ -9,3 +9,4 @@
 
  Bugs:
  - Lobbies can be abused by manually changing view of the page to join lobbies repeatedly
+ - Fix issue where active user is able to guess words and people are able to repeatedly guess words
