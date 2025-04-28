@@ -7,7 +7,7 @@ const colors = ["black", "red", "orange", "yellow", "green", "blue", "purple", "
 const initialLineWidth = 5;
 
 type GameCanvasProps = {
-    canvasRef: React.RefObject<HTMLCanvasElement>
+    canvasRef: React.RefObject<HTMLCanvasElement|null>
 }
 
 

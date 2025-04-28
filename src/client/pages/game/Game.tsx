@@ -10,7 +10,7 @@ type GameProps = {
     users: Map<string, UserData>,
     activeUserId: string | undefined,
     messages: string[],
-    canvasRef: React.RefObject<HTMLCanvasElement>,
+    canvasRef: React.RefObject<HTMLCanvasElement|null>,
     displayScores: boolean,
     time: number | undefined,
     wordLength: number | undefined
