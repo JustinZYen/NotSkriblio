@@ -1,7 +1,7 @@
 import "./theme.css";
 
 import { act, useEffect, useRef, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/home/Home";
 import { LobbySelect } from "./pages/lobby_select/LobbySelect";
 import { PageRoutes } from "./organization/routes";
@@ -273,6 +273,9 @@ function App() {
           <Redirector valid={started}>
             <Game users={users} activeUserId={activeUser} messages={messages}  displayScores={displayingScores} time={time} wordLength={wordLength} canvasRef={gameCanvasRef}/>
           </Redirector>
+        } />
+        <Route path={"/*"} element={
+          <Navigate to={PageRoutes.Home}></Navigate>
         } />
       </Routes>
     </BrowserRouter>
